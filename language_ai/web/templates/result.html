@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}Translating — Kikuyu to English{% endblock %}
+{% block title %}Translating — Language to English{% endblock %}
 {% block content %}
   <p class="hint">{% if job.kind == "text" %}Written text{% else %}{{ job.label }}{% endif %}</p>
 
@@ -19,7 +19,7 @@
     {% set data = job.result or {} %}
     <article class="card">
       <h2>{{ data.language_name or language.name }}</h2>
-      <p id="out-kikuyu" class="text">{{ data.source_text or "" }}</p>
+      <p id="out-language" class="text">{{ data.source_text or "" }}</p>
       {% if data.read_as %}
         <p class="hint">Read as <strong>{{ data.read_as }}</strong> — the tilde vowels were filled in.</p>
       {% endif %}

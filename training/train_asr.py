@@ -27,8 +27,8 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from kikuyu_ai.audio import normalize_audio
-from kikuyu_ai.config import Settings
+from language_ai.audio import normalize_audio
+from language_ai.config import Settings
 
 
 @dataclass(frozen=True)
@@ -262,7 +262,7 @@ def configure_trainable_parameters(model: Any, trainable_regex: str | None, free
 
 def build_parser() -> argparse.ArgumentParser:
     settings = Settings.from_env()
-    parser = argparse.ArgumentParser(description="Fine-tune a Whisper ASR model on Kikuyu audio")
+    parser = argparse.ArgumentParser(description="Fine-tune a Whisper ASR model on Language audio")
     parser.add_argument("manifest", type=Path, help="JSONL rows with audio and text fields")
     parser.add_argument("--eval-manifest", type=Path, help="Optional JSONL eval manifest")
     parser.add_argument("--output", type=Path, default=Path("models/asr"))

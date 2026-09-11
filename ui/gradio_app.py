@@ -1,7 +1,7 @@
 from pathlib import Path
-from kikuyu_ai.config import Settings
-from kikuyu_ai.pipeline import Pipeline
-from kikuyu_ai.remote import RemoteAPIError, translate_audio_remote
+from language_ai.config import Settings
+from language_ai.pipeline import Pipeline
+from language_ai.remote import RemoteAPIError, translate_audio_remote
 
 
 def _existing_file(value):
@@ -43,7 +43,7 @@ def build():
                     None,
                 )
             return (
-                payload.get("kikuyu", ""),
+                payload.get("language", ""),
                 payload.get("english", ""),
                 _payload_file(payload, "translation.mp3", "audio"),
                 _payload_file(payload, "english_subtitles.srt", "english_subtitles")
@@ -56,18 +56,18 @@ def build():
             if not audio:
                 return "", "", None, None
             result = pipeline.run(Path(audio))
-            return result.kikuyu, result.english, result.files.get("translation.mp3"), result.files.get("subtitles.srt")
+            return result.language, result.english, result.files.get("translation.mp3"), result.files.get("subtitles.srt")
 
     return gr.Interface(
         fn=translate,
         inputs=gr.Audio(type="filepath", sources=["upload", "microphone"]),
         outputs=[
-            gr.Textbox(label="Kikuyu"),
+            gr.Textbox(label="Language"),
             gr.Textbox(label="English"),
             gr.Audio(label="English audio"),
             gr.File(label="Subtitles"),
         ],
-        title="Kikuyu to English Translator",
+        title="Language to English Translator",
     )
 
 

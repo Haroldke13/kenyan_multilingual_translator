@@ -32,11 +32,11 @@ sys.path.insert(0, str(MOBILE))
 from mobile import gloss, languages, spelling  # noqa: E402
 from mobile.neural import RUNTIME_NAME  # noqa: E402
 
-#: Where each language's parallel verses live in the desktop project. Kikuyu
+#: Where each language's parallel verses live in the desktop project. Language
 #: sits at the top level for historical reasons; the phone build normalises
 #: every language to data/<code>/ instead.
 SOURCE_CORPORA = {
-    "kikuyu": PROJECT / "data" / "bible" / "parallel.jsonl",
+    "language": PROJECT / "data" / "bible" / "parallel.jsonl",
     "oromo": PROJECT / "data" / "bible" / "oromo" / "parallel.jsonl",
     "somali": PROJECT / "data" / "bible" / "somali" / "parallel.jsonl",
 }
@@ -45,7 +45,7 @@ SOURCE_CORPORA = {
 def read_pairs(path: Path) -> list[tuple[str, str]]:
     """Source/English pairs from a desktop corpus file.
 
-    The desktop format names the source column "kikuyu" whatever the language,
+    The desktop format names the source column "language" whatever the language,
     so that key is read for every language rather than renamed per file.
     """
     pairs: list[tuple[str, str]] = []
@@ -58,7 +58,7 @@ def read_pairs(path: Path) -> list[tuple[str, str]]:
                 row = json.loads(line)
             except json.JSONDecodeError:
                 continue
-            source = (row.get("kikuyu") or "").strip()
+            source = (row.get("language") or "").strip()
             english = (row.get("english") or "").strip()
             if source and english:
                 pairs.append((source, english))
@@ -76,7 +76,7 @@ def read_rows(path: Path) -> list[dict]:
                 row = json.loads(line)
             except json.JSONDecodeError:
                 continue
-            source = (row.get("kikuyu") or "").strip()
+            source = (row.get("language") or "").strip()
             english = (row.get("english") or "").strip()
             if not source or not english:
                 continue
@@ -187,7 +187,7 @@ def _pack_one(job: tuple[str, int, int]) -> dict:
     return pack_language(*job)
 
 
-NLLB_SOURCE = PROJECT / "models" / "downloads" / "huggingface" / "nickdee96--nllb-200-600m-kikuyu-english"
+NLLB_SOURCE = PROJECT / "models" / "downloads" / "huggingface" / "nickdee96--nllb-200-600m-language-english"
 
 
 def pack_translation(quantization: str = "int8") -> dict:

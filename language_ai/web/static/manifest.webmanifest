@@ -1,7 +1,7 @@
 {
-  "name": "Kikuyu AI Translator",
-  "short_name": "Kikuyu AI",
-  "description": "Offline Kikuyu to English speech and text translation.",
+  "name": "Language AI Translator",
+  "short_name": "Language AI",
+  "description": "Offline Language to English speech and text translation.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",

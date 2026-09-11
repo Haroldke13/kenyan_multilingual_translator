@@ -15,7 +15,7 @@ class BibleMatch:
     book: str
     chapter: int
     verse: int
-    kikuyu: str
+    language: str
     english: str
     score: float
 
@@ -23,7 +23,7 @@ class BibleMatch:
 @dataclass
 class TranslationResult:
     session_id: str
-    kikuyu: str
+    language: str
     english: str
     segments: list[Segment]
     bible_match: BibleMatch | None

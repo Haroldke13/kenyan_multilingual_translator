@@ -15,11 +15,11 @@ is not rediscovered later.
 
 ### The NLLB tokenizer stamps `kik_Latn` on every language
 **Symptom:** Somali Genesis 1:1 came back as *"It has been discovered that God has given birth to that plant."* instead of *"In the beginning, God created the heavens and the earth."*
-**Cause:** the checkpoint is Kikuyu-fine-tuned, so `tokenizer.json`'s post-processor hard-codes `kik_Latn` as the source tag. `Tokenizer.encode()` applies it regardless of the requested language. This is the same defect that makes the desktop PWA mistranslate non-Kikuyu input.
+**Cause:** the checkpoint is Language-fine-tuned, so `tokenizer.json`'s post-processor hard-codes `kik_Latn` as the source tag. `Tokenizer.encode()` applies it regardless of the requested language. This is the same defect that makes the desktop PWA mistranslate non-Language input.
 **Fix:** `NeuralTranslator._encode` overwrites token 0 with the correct tag when it matches the `xxx_Xxxx` shape, prepending it otherwise. All four languages verified correct afterwards.
 
 ### A mis-heard recording produced confident, fluent nonsense
-**Symptom:** the phone speech model transcribed a Kikuyu voice note as `oholowaku`; the translator turned that into **"Alright"**, presented exactly like a correct result.
+**Symptom:** the phone speech model transcribed a Language voice note as `oholowaku`; the translator turned that into **"Alright"**, presented exactly like a correct result.
 **Cause:** the neural tier had no quality gate. The verse tier requires 0.82 overlap and the gloss tier requires 50% known words, but the neural tier translated anything handed to it.
 **Fix:** `Engine.heard_well` scores the transcript against the language's own vocabulary; below 34% the result carries a visible warning. Returns `None` for Kamba, which has no word list, so no false warning is raised.
 

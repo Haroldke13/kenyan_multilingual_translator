@@ -15,7 +15,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from pathlib import Path
 
-DEFAULT_LANGUAGE = "kikuyu"
+DEFAULT_LANGUAGE = "language"
 
 
 @dataclass(frozen=True)
@@ -39,9 +39,9 @@ class Language:
 
 
 LANGUAGES: dict[str, Language] = {
-    "kikuyu": Language(
-        code="kikuyu",
-        name="Kikuyu",
+    "language": Language(
+        code="language",
+        name="Language",
         native="Gĩgĩkũyũ",
         nllb_code="kik_Latn",
         mms_code="kik",

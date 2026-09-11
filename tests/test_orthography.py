@@ -1,11 +1,11 @@
-"""Restoring Kikuyu tilde vowels on text typed without them."""
+"""Restoring Language tilde vowels on text typed without them."""
 
 import json
 from pathlib import Path
 
 import pytest
 
-from kikuyu_ai.orthography import (
+from language_ai.orthography import (
     LEXICON_NAME,
     build_lexicon,
     fold,
@@ -35,7 +35,7 @@ def test_fold_strips_diacritics_and_case():
     assert fold("rũciũ") == fold("RUCIU") == "ruciu"
 
 
-def test_has_tilde_detects_the_kikuyu_vowels():
+def test_has_tilde_detects_the_language_vowels():
     assert has_tilde("rũciũ")
     assert not has_tilde("ruciu")
 
@@ -113,7 +113,7 @@ def test_no_lexicon_means_the_text_passes_through():
 def _write_corpus(folder: Path) -> None:
     folder.mkdir(parents=True, exist_ok=True)
     (folder / "parallel.jsonl").write_text(
-        "".join(json.dumps({"kikuyu": text, "english": "x"}, ensure_ascii=False) + "\n" for text in CORPUS),
+        "".join(json.dumps({"language": text, "english": "x"}, ensure_ascii=False) + "\n" for text in CORPUS),
         encoding="utf-8",
     )
 
@@ -131,7 +131,7 @@ def test_a_stale_cache_is_rebuilt_when_the_corpus_changes(tmp_path: Path):
     _write_corpus(tmp_path)
     load_lexicon(tmp_path)
     (tmp_path / "parallel.jsonl").write_text(
-        json.dumps({"kikuyu": "Kĩrĩra kĩa andũ", "english": "x"}, ensure_ascii=False) + "\n",
+        json.dumps({"language": "Kĩrĩra kĩa andũ", "english": "x"}, ensure_ascii=False) + "\n",
         encoding="utf-8",
     )
 

@@ -11,9 +11,9 @@ def _reexec_project_venv() -> None:
     venv_python = root / ".venv" / "bin" / "python"
     if not venv_python.exists() or Path(sys.prefix).resolve() == venv.resolve():
         return
-    if os.environ.get("KIKUYU_NO_VENV_REEXEC"):
+    if os.environ.get("LANGUAGE_NO_VENV_REEXEC"):
         return
-    os.execv(str(venv_python), [str(venv_python), "-m", "kikuyu_ai.cli", *sys.argv[1:]])
+    os.execv(str(venv_python), [str(venv_python), "-m", "language_ai.cli", *sys.argv[1:]])
 
 
 _reexec_project_venv()
@@ -24,18 +24,18 @@ from .remote import RemoteAPIError, translate_audio_remote
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Translate a Kikuyu recording into English")
+    parser = argparse.ArgumentParser(description="Translate a Language recording into English")
     parser.add_argument("audio", type=Path)
     parser.add_argument("--session-id")
     parser.add_argument("--asr-only", action="store_true", help="write transcript/session files without loading the translation model")
-    parser.add_argument("--api-url", help="Remote FastAPI base URL; overrides KIKUYU_API_URL")
+    parser.add_argument("--api-url", help="Remote FastAPI base URL; overrides LANGUAGE_API_URL")
     args = parser.parse_args()
     if args.api_url:
-        os.environ["KIKUYU_API_URL"] = args.api_url
+        os.environ["LANGUAGE_API_URL"] = args.api_url
     settings = Settings.from_env()
     if settings.api_url:
         if args.asr_only:
-            raise SystemExit("--asr-only is local-only; unset KIKUYU_API_URL or omit --api-url")
+            raise SystemExit("--asr-only is local-only; unset LANGUAGE_API_URL or omit --api-url")
         try:
             payload = translate_audio_remote(settings.api_url, args.audio, session_id=args.session_id)
         except RemoteAPIError as exc:
@@ -44,7 +44,7 @@ def main() -> None:
                 "Start the API with ./translate.sh server on that machine, or choose the correct API URL."
             ) from None
         print(f"session: {payload.get('session_id')}")
-        print(f"kikuyu: {payload.get('kikuyu', '')}")
+        print(f"language: {payload.get('language', '')}")
         print(f"english: {payload.get('english', '')}")
         for name, path in (payload.get("files") or {}).items():
             print(f"{name}: {path}")
@@ -56,7 +56,7 @@ def main() -> None:
         settings = replace(settings, translation_model=None, tts_command=None)
     result = Pipeline(settings).run(args.audio, args.session_id)
     print(f"session: {result.session_id}")
-    print(f"kikuyu: {result.kikuyu}")
+    print(f"language: {result.language}")
     print(f"english: {result.english}")
     for name, path in result.files.items():
         print(f"{name}: {path}")

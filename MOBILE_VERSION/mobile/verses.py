@@ -134,7 +134,7 @@ class VerseIndex:
             return writable
         except OSError:
             # Installed somewhere read-only, e.g. straight off an SD card.
-            return Path(tempfile.gettempdir()) / f"kikuyu-{self.data_dir.name}-{CACHE_NAME}"
+            return Path(tempfile.gettempdir()) / f"language-{self.data_dir.name}-{CACHE_NAME}"
 
     def _signature(self) -> str:
         """Identify the corpus by size alone, deliberately not by timestamp.

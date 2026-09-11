@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pytest
 
-from kikuyu_ai.corpus import (
+from language_ai.corpus import (
     align_blocks,
     dedupe,
     guess_language,
@@ -26,7 +26,7 @@ def test_normalize_text_rejoins_hyphenated_line_breaks():
     assert normalize_text("mwa-\nndĩki  wa\tNgai") == "mwandĩki wa Ngai"
 
 
-def test_normalize_text_keeps_kikuyu_tilde_vowels():
+def test_normalize_text_keeps_language_tilde_vowels():
     assert normalize_text("Kĩambĩrĩria ũrĩa") == "Kĩambĩrĩria ũrĩa"
 
 
@@ -45,22 +45,22 @@ def test_is_noise_line_flags_page_numbers_but_keeps_prose():
 
 
 def test_guess_language_separates_the_two_languages():
-    assert guess_language("Nake Ngai akiuga atĩrĩ, nĩ wega mũno") == "kikuyu"
+    assert guess_language("Nake Ngai akiuga atĩrĩ, nĩ wega mũno") == "language"
     assert guess_language("And God said that it was very good") == "english"
 
 
 def test_align_blocks_matches_sentences_one_to_one():
-    kikuyu = ["Mũndũ wa mbere.", "Mũndũ wa kerĩ nĩwe mũnene.", "Thutha ũcio agĩũka."]
+    language = ["Mũndũ wa mbere.", "Mũndũ wa kerĩ nĩwe mũnene.", "Thutha ũcio agĩũka."]
     english = ["The first person.", "The second person is the great one.", "After that he came."]
-    assert align_blocks(kikuyu, english) == list(zip(kikuyu, english))
+    assert align_blocks(language, english) == list(zip(language, english))
 
 
 def test_align_blocks_recovers_when_one_side_splits_a_sentence():
-    kikuyu = ["Mũndũ ũcio nĩ mwega.", "Nĩ mwega mũno na nĩ mũtaare wa andũ othe a bũrũri."]
+    language = ["Mũndũ ũcio nĩ mwega.", "Nĩ mwega mũno na nĩ mũtaare wa andũ othe a bũrũri."]
     english = ["That person is good.", "He is very good.", "He is a counsellor of all the people of the land."]
-    pairs = align_blocks(kikuyu, english)
+    pairs = align_blocks(language, english)
     assert pairs[0] == ("Mũndũ ũcio nĩ mwega.", "That person is good.")
-    assert pairs[1][0] == kikuyu[1]
+    assert pairs[1][0] == language[1]
     assert pairs[1][1] == "He is very good. He is a counsellor of all the people of the land."
 
 
@@ -89,15 +89,15 @@ def test_drop_repeated_headers_removes_running_page_furniture():
     assert drop_repeated_headers(lines, 3) == ["Ngai nĩ mwega", "Andũ nĩ mokire"]
 
 
-def test_pair_language_runs_does_not_pair_english_with_the_next_kikuyu():
+def test_pair_language_runs_does_not_pair_english_with_the_next_language():
     """Interleaved text must be consumed two runs at a time, not slid by one."""
     runs = [
-        ("kikuyu", ["Mũndũ ũcio nĩ mwega."]),
+        ("language", ["Mũndũ ũcio nĩ mwega."]),
         ("english", ["That person is good."]),
-        ("kikuyu", ["Andũ othe nĩ mokire."]),
+        ("language", ["Andũ othe nĩ mokire."]),
         ("english", ["All the people came."]),
     ]
-    assert [(pair.kikuyu, pair.english) for pair in pair_language_runs(runs)] == [
+    assert [(pair.language, pair.english) for pair in pair_language_runs(runs)] == [
         ("Mũndũ ũcio nĩ mwega.", "That person is good."),
         ("Andũ othe nĩ mokire.", "All the people came."),
     ]
@@ -106,12 +106,12 @@ def test_pair_language_runs_does_not_pair_english_with_the_next_kikuyu():
 def test_pair_language_runs_recovers_when_a_stray_run_leads():
     runs = [
         ("english", ["A title page in English."]),
-        ("kikuyu", ["Mũndũ ũcio nĩ mwega."]),
+        ("language", ["Mũndũ ũcio nĩ mwega."]),
         ("english", ["That person is good."]),
-        ("kikuyu", ["Andũ othe nĩ mokire."]),
+        ("language", ["Andũ othe nĩ mokire."]),
         ("english", ["All the people came."]),
     ]
-    pairs = [(pair.kikuyu, pair.english) for pair in pair_language_runs(runs)]
+    pairs = [(pair.language, pair.english) for pair in pair_language_runs(runs)]
     assert pairs == [
         ("Mũndũ ũcio nĩ mwega.", "That person is good."),
         ("Andũ othe nĩ mokire.", "All the people came."),
@@ -120,7 +120,7 @@ def test_pair_language_runs_recovers_when_a_stray_run_leads():
 
 def test_language_runs_attaches_ambiguous_lines_to_the_previous_run():
     runs = language_runs(["Nake Ngai akiuga atĩrĩ nĩ wega", "1997", "And God said it was good"])
-    assert [language for language, _ in runs] == ["kikuyu", "english"]
+    assert [language for language, _ in runs] == ["language", "english"]
     assert runs[0][1] == ["Nake Ngai akiuga atĩrĩ nĩ wega", "1997"]
 
 
@@ -139,7 +139,7 @@ def _corrections_db(path: Path) -> Path:
 
 def test_from_corrections_reads_human_labels(tmp_path: Path):
     pairs = from_corrections(_corrections_db(tmp_path / "corrections.db"))
-    assert [(pair.kikuyu, pair.english) for pair in pairs] == [
+    assert [(pair.language, pair.english) for pair in pairs] == [
         ("Ngai nĩ mwega hĩndĩ ciothe", "God is good at all times")
     ]
     assert pairs[0].meta["verified"] is True
@@ -164,13 +164,13 @@ def _wav(path: Path, seconds: float = 0.5) -> None:
 
 def test_from_voice_pairs_reads_sidecars_and_reports_missing_transcripts(tmp_path: Path):
     _wav(tmp_path / "clip01.wav")
-    (tmp_path / "clip01.kikuyu.txt").write_text("Nĩĩ ndĩ mwana wa Ngai", encoding="utf-8")
+    (tmp_path / "clip01.language.txt").write_text("Nĩĩ ndĩ mwana wa Ngai", encoding="utf-8")
     (tmp_path / "clip01.english.txt").write_text("I am a child of God", encoding="utf-8")
     _wav(tmp_path / "clip02.wav")
 
     pairs, manifest, missing = from_voice_pairs(tmp_path)
 
-    assert [(pair.kikuyu, pair.english) for pair in pairs] == [("Nĩĩ ndĩ mwana wa Ngai", "I am a child of God")]
+    assert [(pair.language, pair.english) for pair in pairs] == [("Nĩĩ ndĩ mwana wa Ngai", "I am a child of God")]
     assert manifest == [{"audio": str(tmp_path / "clip01.wav"), "text": "Nĩĩ ndĩ mwana wa Ngai"}]
     assert missing == [str(tmp_path / "clip02.wav")]
 
@@ -179,7 +179,7 @@ def _session(root: Path, name: str, *, corrected: bool) -> Path:
     folder = root / name
     folder.mkdir(parents=True)
     _wav(folder / "audio_clean.wav")
-    (folder / "kikuyu.txt").write_text("mũndũ ũcio nĩ mwega", encoding="utf-8")
+    (folder / "language.txt").write_text("mũndũ ũcio nĩ mwega", encoding="utf-8")
     (folder / "english.txt").write_text("that person good", encoding="utf-8")
     if corrected:
         (folder / "english.corrected.txt").write_text("That person is good", encoding="utf-8")
@@ -218,7 +218,7 @@ def test_from_sessions_prefers_per_segment_rows_for_machine_output(tmp_path: Pat
 
     pairs, _ = from_sessions(tmp_path, include_machine_output=True)
 
-    assert [(pair.kikuyu, pair.english) for pair in pairs] == [("kĩrĩra kĩa andũ", "the wisdom of people")]
+    assert [(pair.language, pair.english) for pair in pairs] == [("kĩrĩra kĩa andũ", "the wisdom of people")]
 
 
 def test_from_sessions_ignores_partial_session_folders(tmp_path: Path):
@@ -237,7 +237,7 @@ def test_parse_repeats_rejects_malformed_values():
         parse_repeats(["voice.jsonl=many"])
 
 
-def test_write_jsonl_round_trips_kikuyu_characters(tmp_path: Path):
+def test_write_jsonl_round_trips_language_characters(tmp_path: Path):
     target = tmp_path / "rows.jsonl"
-    assert write_jsonl(target, [{"kikuyu": "Kĩambĩrĩria", "english": "Beginning"}]) == 1
-    assert json.loads(target.read_text(encoding="utf-8"))["kikuyu"] == "Kĩambĩrĩria"
+    assert write_jsonl(target, [{"language": "Kĩambĩrĩria", "english": "Beginning"}]) == 1
+    assert json.loads(target.read_text(encoding="utf-8"))["language"] == "Kĩambĩrĩria"

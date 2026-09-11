@@ -18,20 +18,20 @@ import os
 from dataclasses import dataclass, replace
 from pathlib import Path
 
-DEFAULT_LANGUAGE = "kikuyu"
+DEFAULT_LANGUAGE = "language"
 
 #: One shared encoder, swapped per-language adapters.
 MMS_MODEL = "models/downloads/huggingface/facebook--mms-1b-all"
 
-def kikuyu_engine() -> str:
-    """Which speech model Kikuyu uses: "mms" (default) or "whisper".
+def language_engine() -> str:
+    """Which speech model Language uses: "mms" (default) or "whisper".
 
     Read on each call rather than at import, so setting the variable after the
-    module is loaded still takes effect. MMS transcribes more real Kikuyu words
+    module is loaded still takes effect. MMS transcribes more real Language words
     and restores the tilde vowels, but needs about three times the memory and
     runs about 2.5x slower, so both options stay open.
     """
-    return os.environ.get("KIKUYU_ASR_ENGINE", "mms").strip().casefold()
+    return os.environ.get("LANGUAGE_ASR_ENGINE", "mms").strip().casefold()
 
 
 @dataclass(frozen=True)
@@ -39,7 +39,7 @@ class Language:
     code: str
     name: str
     nllb_code: str
-    #: Folder under data/bible holding parallel.jsonl. Kikuyu keeps the top
+    #: Folder under data/bible holding parallel.jsonl. Language keeps the top
     #: level so existing installs and paths keep working.
     bible_subdir: str = ""
     speech: bool = False
@@ -68,20 +68,20 @@ def _mms(code: str, name: str, nllb: str, adapter: str, subdir: str, placeholder
     )
 
 
-KIKUYU_PLACEHOLDER = "Andĩka kana ũcookererie Gĩgĩkũyũ haha…"
-#: Kikuyu keeps the top-level corpus folder that earlier versions wrote to.
-KIKUYU_MMS = _mms("kikuyu", "Kikuyu", "kik_Latn", "kik", "", KIKUYU_PLACEHOLDER)
-KIKUYU_WHISPER = Language(
-    code="kikuyu",
-    name="Kikuyu",
+LANGUAGE_PLACEHOLDER = "Andĩka kana ũcookererie Gĩgĩkũyũ haha…"
+#: Language keeps the top-level corpus folder that earlier versions wrote to.
+LANGUAGE_MMS = _mms("language", "Language", "kik_Latn", "kik", "", LANGUAGE_PLACEHOLDER)
+LANGUAGE_WHISPER = Language(
+    code="language",
+    name="Language",
     nllb_code="kik_Latn",
     bible_subdir="",
     speech=True,
-    placeholder=KIKUYU_PLACEHOLDER,
+    placeholder=LANGUAGE_PLACEHOLDER,
 )
 
 LANGUAGES: dict[str, Language] = {
-    "kikuyu": KIKUYU_MMS,
+    "language": LANGUAGE_MMS,
     "luo": _mms("luo", "Luo", "luo_Latn", "luo", "luo", "Ndik kata mak weche mag Dholuo ka…"),
     "kamba": _mms("kamba", "Kamba", "kam_Latn", "kam", "kamba", "Andĩka Kĩkamba vaa…"),
     "swahili": _mms("swahili", "Swahili", "swh_Latn", "swh", "swahili", "Andika Kiswahili hapa…"),
@@ -92,8 +92,8 @@ LANGUAGES: dict[str, Language] = {
 
 def _resolve(language: Language) -> Language:
     """Apply any choice that depends on the environment right now."""
-    if language.code == "kikuyu":
-        return KIKUYU_MMS if kikuyu_engine() == "mms" else KIKUYU_WHISPER
+    if language.code == "language":
+        return LANGUAGE_MMS if language_engine() == "mms" else LANGUAGE_WHISPER
     return language
 
 

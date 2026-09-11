@@ -19,7 +19,7 @@ os.environ.setdefault("TRANSFORMERS_VERBOSITY", "error")
 
 def configure_torch(torch: Any) -> None:
     """Keep CPU inference from over-allocating worker memory on mobile devices."""
-    threads = int(os.environ.get("KIKUYU_TORCH_THREADS", "1") or "1")
+    threads = int(os.environ.get("LANGUAGE_TORCH_THREADS", "1") or "1")
     for key in ("OMP_NUM_THREADS", "OPENBLAS_NUM_THREADS", "MKL_NUM_THREADS", "NUMEXPR_NUM_THREADS"):
         os.environ.setdefault(key, str(threads))
     try:

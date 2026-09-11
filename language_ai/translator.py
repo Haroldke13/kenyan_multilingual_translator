@@ -17,7 +17,7 @@ class Translator:
         self.src_lang = src_lang
         self.tgt_lang = tgt_lang
         self.max_new_tokens = max(16, int(max_new_tokens or 128))
-        self.progress = os.environ.get("KIKUYU_TRANSLATION_PROGRESS", "").casefold() in {"1", "true", "yes", "on"}
+        self.progress = os.environ.get("LANGUAGE_TRANSLATION_PROGRESS", "").casefold() in {"1", "true", "yes", "on"}
         self._model = None
 
     def unload(self) -> None:
@@ -134,14 +134,14 @@ class BibleAligner:
             return None
         best = None
         for row in self.rows:
-            target = self._tokens(row.get("kikuyu", ""))
+            target = self._tokens(row.get("language", ""))
             score = len(source & target) / max(1, len(source | target))
             if best is None or score > best[0]:
                 best = (score, row)
         if not best or best[0] < self.threshold:
             return None
         row = best[1]
-        return BibleMatch(str(row["book"]), int(row["chapter"]), int(row["verse"]), row["kikuyu"], row["english"], round(best[0], 4))
+        return BibleMatch(str(row["book"]), int(row["chapter"]), int(row["verse"]), row["language"], row["english"], round(best[0], 4))
 
 
 def save_correction(db_path: Path, source: str, machine: str, corrected: str) -> int:

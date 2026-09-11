@@ -3,9 +3,9 @@ requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "kikuyu-ai"
+name = "language-ai"
 version = "0.1.0"
-description = "Offline-first Kikuyu to English speech translation pipeline"
+description = "Offline-first Language to English speech translation pipeline"
 requires-python = ">=3.10"
 dependencies = []
 
@@ -20,11 +20,11 @@ exports = ["python-docx", "reportlab"]
 dev = ["pytest>=8"]
 
 [project.scripts]
-kikuyu-translate = "kikuyu_ai.cli:main"
-kikuyu-api = "kikuyu_ai.web.api:run"
+language-translate = "language_ai.cli:main"
+language-api = "language_ai.web.api:run"
 
 [tool.setuptools.package-data]
-"kikuyu_ai.web" = ["static/*", "static/icons/*", "templates/*"]
+"language_ai.web" = ["static/*", "static/icons/*", "templates/*"]
 
 [tool.setuptools.packages.find]
-include = ["kikuyu_ai*"]
+include = ["language_ai*"]

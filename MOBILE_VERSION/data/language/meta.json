@@ -1,5 +1,5 @@
 {
-  "language": "kikuyu",
+  "language": "language",
   "corpus": true,
   "source": "data/bible/parallel.jsonl",
   "verses": 31094,

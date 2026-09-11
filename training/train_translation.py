@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""Fine-tune a local Seq2Seq Kikuyu-English translation model from JSONL pairs.
+"""Fine-tune a local Seq2Seq Language-English translation model from JSONL pairs.
 
 Input rows must contain:
-{"kikuyu": "source text", "english": "target text"}
+{"language": "source text", "english": "target text"}
 
 Rows may optionally contain {"split": "train"} or {"split": "eval"}.
 """
@@ -24,12 +24,12 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from kikuyu_ai.config import Settings
+from language_ai.config import Settings
 
 
 @dataclass(frozen=True)
 class TranslationExample:
-    kikuyu: str
+    language: str
     english: str
     split: str | None = None
 
@@ -43,12 +43,12 @@ def read_parallel(path: Path) -> list[TranslationExample]:
             row = json.loads(line)
         except json.JSONDecodeError as exc:
             raise SystemExit(f"{path}:{line_number}: invalid JSON: {exc}") from exc
-        kikuyu = str(row.get("kikuyu", "")).strip()
+        language = str(row.get("language", "")).strip()
         english = str(row.get("english", "")).strip()
-        if not kikuyu or not english:
-            raise SystemExit(f"{path}:{line_number}: every row needs non-empty kikuyu and english")
+        if not language or not english:
+            raise SystemExit(f"{path}:{line_number}: every row needs non-empty language and english")
         split = row.get("split")
-        examples.append(TranslationExample(kikuyu, english, str(split).casefold() if split else None))
+        examples.append(TranslationExample(language, english, str(split).casefold() if split else None))
     if not examples:
         raise SystemExit(f"{path}: no parallel rows found")
     return examples
@@ -144,7 +144,7 @@ class ParallelDataset:
         if self.src_lang and hasattr(self.tokenizer, "src_lang"):
             self.tokenizer.src_lang = self.src_lang
         model_inputs = self.tokenizer(
-            item.kikuyu,
+            item.language,
             truncation=True,
             max_length=self.max_source_length,
         )
@@ -203,8 +203,8 @@ def configure_trainable_parameters(model: Any, trainable_regex: str | None, free
 
 def build_parser() -> argparse.ArgumentParser:
     settings = Settings.from_env()
-    parser = argparse.ArgumentParser(description="Fine-tune a Seq2Seq Kikuyu-English translation model")
-    parser.add_argument("parallel", type=Path, help="JSONL rows with kikuyu and english fields")
+    parser = argparse.ArgumentParser(description="Fine-tune a Seq2Seq Language-English translation model")
+    parser.add_argument("parallel", type=Path, help="JSONL rows with language and english fields")
     parser.add_argument("--eval-parallel", type=Path, help="Optional eval JSONL file")
     parser.add_argument("--output", type=Path, default=Path("models/translation"))
     parser.add_argument("--model-name", default=settings.translation_model)
@@ -243,7 +243,7 @@ def build_parser() -> argparse.ArgumentParser:
 def main() -> None:
     args = build_parser().parse_args()
     if not args.model_name:
-        raise SystemExit("set --model-name or KIKUYU_TRANSLATION_MODEL")
+        raise SystemExit("set --model-name or LANGUAGE_TRANSLATION_MODEL")
 
     train_examples, eval_examples = split_examples(
         read_parallel(args.parallel),

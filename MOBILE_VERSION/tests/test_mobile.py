@@ -69,16 +69,16 @@ def test_runtime_uses_only_the_standard_library():
 
 # -- languages -------------------------------------------------------------
 
-def test_four_languages_default_to_kikuyu():
-    assert [language.code for language in languages.ordered()] == ["kikuyu", "kamba", "oromo", "somali"]
-    assert languages.get(None).code == "kikuyu"
-    assert languages.get("nonsense").code == "kikuyu"
+def test_four_languages_default_to_language():
+    assert [language.code for language in languages.ordered()] == ["language", "kamba", "oromo", "somali"]
+    assert languages.get(None).code == "language"
+    assert languages.get("nonsense").code == "language"
     assert languages.get("SOMALI").code == "somali"
 
 
 def test_kamba_is_marked_as_having_no_corpus():
     assert languages.get("kamba").corpus is False
-    assert all(languages.get(code).corpus for code in ("kikuyu", "oromo", "somali"))
+    assert all(languages.get(code).corpus for code in ("language", "oromo", "somali"))
 
 
 def test_each_language_has_a_distinct_nllb_and_mms_tag():
@@ -309,31 +309,31 @@ def test_request_body_is_not_left_behind(tmp_path):
 
 @pytest.fixture
 def engine(tmp_path, verse_dir):
-    (tmp_path / "data" / "kikuyu").mkdir(parents=True)
+    (tmp_path / "data" / "language").mkdir(parents=True)
     for name in ("verses.jsonl.gz",):
-        (tmp_path / "data" / "kikuyu" / name).write_bytes((verse_dir / name).read_bytes())
-    with gzip.open(tmp_path / "data" / "kikuyu" / gloss.GLOSS_NAME, "wt", encoding="utf-8") as handle:
+        (tmp_path / "data" / "language" / name).write_bytes((verse_dir / name).read_bytes())
+    with gzip.open(tmp_path / "data" / "language" / gloss.GLOSS_NAME, "wt", encoding="utf-8") as handle:
         json.dump({"words": {"ngai": ["god"], "nĩ": ["is"], "mwega": ["good"], "mũno": ["very"]}}, handle)
-    with gzip.open(tmp_path / "data" / "kikuyu" / spelling.SPELLING_NAME, "wt", encoding="utf-8") as handle:
+    with gzip.open(tmp_path / "data" / "language" / spelling.SPELLING_NAME, "wt", encoding="utf-8") as handle:
         json.dump({"words": {"muno": "mũno", "jesu": "jesũ", "akirira": "akĩrĩra"}}, handle)
     return Engine(tmp_path)
 
 
 def test_scripture_returns_the_published_english(engine):
-    result = engine.translate_text("Nake Jesũ akĩrĩra.", languages.get("kikuyu"))
+    result = engine.translate_text("Nake Jesũ akĩrĩra.", languages.get("language"))
     assert result.engine == "verse"
     assert result.english == "Jesus wept."
     assert result.verse.reference == "JHN 11:35"
 
 
 def test_accents_are_filled_in_before_the_verse_is_looked_up(engine):
-    result = engine.translate_text("Nake jesu akirira.", languages.get("kikuyu"))
+    result = engine.translate_text("Nake jesu akirira.", languages.get("language"))
     assert result.engine == "verse"
     assert result.read_as is not None
 
 
 def test_ordinary_text_falls_back_to_a_labelled_gloss(engine):
-    result = engine.translate_text("ngai nĩ mwega mũno", languages.get("kikuyu"))
+    result = engine.translate_text("ngai nĩ mwega mũno", languages.get("language"))
     assert result.engine == "gloss"
     assert result.english == "god is good very"
     assert "word-by-word" in result.note.casefold()
@@ -348,7 +348,7 @@ def test_a_language_with_no_data_says_so_instead_of_guessing(engine):
 
 
 def test_near_verse_is_offered_without_being_claimed(engine):
-    result = engine.translate_text("Kĩambĩrĩria-inĩ Ngai nĩombire", languages.get("kikuyu"))
+    result = engine.translate_text("Kĩambĩrĩria-inĩ Ngai nĩombire", languages.get("language"))
     assert result.engine != "verse"
     assert result.near_verse is not None and result.near_verse.reference == "GEN 1:1"
 
@@ -356,14 +356,14 @@ def test_near_verse_is_offered_without_being_claimed(engine):
 def test_capabilities_report_what_is_missing(engine):
     caps = engine.capabilities()
     assert caps["neural_translation"] is False
-    assert caps["languages"]["kikuyu"]["verses"] is True
+    assert caps["languages"]["language"]["verses"] is True
     assert caps["languages"]["kamba"]["verses"] is False
 
 
 def test_mis_heard_transcript_is_flagged(engine):
-    kikuyu = languages.get("kikuyu")
-    assert engine.heard_well("oholowaku", kikuyu) == 0.0
-    assert engine.heard_well("ngai nĩ mwega", kikuyu) == 1.0
+    language = languages.get("language")
+    assert engine.heard_well("oholowaku", language) == 0.0
+    assert engine.heard_well("ngai nĩ mwega", language) == 1.0
 
 
 def test_heard_well_is_none_when_there_is_nothing_to_check_against(engine):
@@ -371,6 +371,6 @@ def test_heard_well_is_none_when_there_is_nothing_to_check_against(engine):
 
 
 def test_result_serialises_for_the_browser(engine):
-    payload = engine.translate_text("Nake Jesũ akĩrĩra.", languages.get("kikuyu")).as_dict()
+    payload = engine.translate_text("Nake Jesũ akĩrĩra.", languages.get("language")).as_dict()
     assert json.loads(json.dumps(payload))["verse"]["reference"] == "JHN 11:35"
     assert set(payload) >= {"english", "engine", "warning", "read_as", "near_verse"}

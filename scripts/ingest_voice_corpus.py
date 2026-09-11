@@ -7,11 +7,11 @@ Four sources are read, all of them local:
                 button. The corrected English is a human label.
   voice pairs   a folder of recordings with transcript sidecars:
                     clip01.wav
-                    clip01.kikuyu.txt      what was said
+                    clip01.language.txt      what was said
                     clip01.english.txt     what it means (optional)
                 These feed both the translator and the speech recogniser.
   sessions      finished session folders that a person has reviewed, marked by
-                writing kikuyu.corrected.txt / english.corrected.txt into them.
+                writing language.corrected.txt / english.corrected.txt into them.
   machine       raw uncorrected app output, only with --include-machine-output.
 
     python scripts/ingest_voice_corpus.py \
@@ -34,11 +34,11 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from kikuyu_ai.audio import wav_duration
-from kikuyu_ai.config import Settings
-from kikuyu_ai.corpus import Pair, dedupe, normalize_text, read_jsonl, usable_pair, write_jsonl
+from language_ai.audio import wav_duration
+from language_ai.config import Settings
+from language_ai.corpus import Pair, dedupe, normalize_text, read_jsonl, usable_pair, write_jsonl
 
-TRANSCRIPT_SUFFIXES = (".kikuyu.txt", ".kik.txt", ".txt")
+TRANSCRIPT_SUFFIXES = (".language.txt", ".kik.txt", ".txt")
 TRANSLATION_SUFFIXES = (".english.txt", ".eng.txt", ".en.txt")
 
 
@@ -52,7 +52,7 @@ def read_sidecar(audio: Path, suffixes: tuple[str, ...]) -> str:
 
 
 def from_corrections(db_path: Path) -> list[Pair]:
-    """Human-corrected English for a Kikuyu source is ground truth."""
+    """Human-corrected English for a Language source is ground truth."""
     if not db_path.is_file():
         return []
     with sqlite3.connect(f"file:{db_path}?mode=ro", uri=True) as db:
@@ -94,14 +94,14 @@ def from_voice_pairs(folder: Path) -> tuple[list[Pair], list[dict], list[str]]:
     manifest: list[dict] = []
     missing: list[str] = []
     for audio in voice_files(folder):
-        kikuyu = read_sidecar(audio, TRANSCRIPT_SUFFIXES)
-        if not kikuyu:
+        language = read_sidecar(audio, TRANSCRIPT_SUFFIXES)
+        if not language:
             missing.append(str(audio))
             continue
-        manifest.append({"audio": str(audio), "text": kikuyu})
+        manifest.append({"audio": str(audio), "text": language})
         english = read_sidecar(audio, TRANSLATION_SUFFIXES)
         if english:
-            pairs.append(Pair(kikuyu, english, f"voice:{audio.name}", {"verified": True}))
+            pairs.append(Pair(language, english, f"voice:{audio.name}", {"verified": True}))
     return pairs, manifest, missing
 
 
@@ -136,17 +136,17 @@ def from_sessions(sessions: Path, include_machine_output: bool) -> tuple[list[Pa
     for folder in sorted(sessions.iterdir()):
         if not folder.is_dir() or folder.name.startswith("."):
             continue
-        kikuyu = session_text(folder, "kikuyu.corrected.txt")
+        language = session_text(folder, "language.corrected.txt")
         english = session_text(folder, "english.corrected.txt")
-        verified = bool(kikuyu or english)
-        kikuyu = kikuyu or session_text(folder, "kikuyu.txt")
+        verified = bool(language or english)
+        language = language or session_text(folder, "language.txt")
         english = english or session_text(folder, "english.txt")
 
         audio = folder / "audio_clean.wav"
-        if kikuyu and verified and audio.is_file() and wav_duration(audio) > 0:
-            manifest.append({"audio": str(audio), "text": kikuyu})
+        if language and verified and audio.is_file() and wav_duration(audio) > 0:
+            manifest.append({"audio": str(audio), "text": language})
 
-        if not (kikuyu and english):
+        if not (language and english):
             continue
         if not verified and not include_machine_output:
             continue
@@ -157,7 +157,7 @@ def from_sessions(sessions: Path, include_machine_output: bool) -> tuple[list[Pa
         target_segments = segment_rows(folder / "english_segments.jsonl")
         shared = sorted(set(source_segments) & set(target_segments))
         if verified or not shared:
-            pairs.append(Pair(kikuyu, english, f"session:{folder.name}", {"verified": verified}))
+            pairs.append(Pair(language, english, f"session:{folder.name}", {"verified": verified}))
             continue
         for span in shared:
             pairs.append(Pair(source_segments[span], target_segments[span], f"session:{folder.name}", {"verified": False}))
@@ -193,7 +193,7 @@ def main() -> None:
     kept = dedupe(
         pair
         for pair in all_pairs
-        if usable_pair(pair.kikuyu, pair.english, args.min_chars, args.max_chars, args.max_length_ratio)
+        if usable_pair(pair.language, pair.english, args.min_chars, args.max_chars, args.max_length_ratio)
     )
     written = write_jsonl(args.output, [pair.row() for pair in kept])
 
@@ -216,14 +216,14 @@ def main() -> None:
     if missing:
         print(f"\n{len(missing)} recording(s) have no transcript sidecar and were skipped:")
         for path in missing[:5]:
-            print(f"  {path}  (add {Path(path).stem}.kikuyu.txt)")
+            print(f"  {path}  (add {Path(path).stem}.language.txt)")
         if len(missing) > 5:
             print(f"  ... and {len(missing) - 5} more")
 
     if not written:
         print(
             "\nNo usable rows yet. Record audio into data/voice/, write what was said into\n"
-            "<name>.kikuyu.txt and what it means into <name>.english.txt, then re-run."
+            "<name>.language.txt and what it means into <name>.english.txt, then re-run."
         )
 
 

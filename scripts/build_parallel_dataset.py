@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""Build aligned Kikuyu-English Bible JSONL from verse files.
+"""Build aligned Language-English Bible JSONL from verse files.
 
 Supported inputs:
-- JSON/JSONL rows with book, chapter, verse and kikuyu/english/text fields.
+- JSON/JSONL rows with book, chapter, verse and language/english/text fields.
 - eBible VPL text: ``GEN 1:1 Verse text``.
 - ZIP files containing one ``*_vpl.txt`` file.
 """
@@ -78,8 +78,8 @@ def key(row: dict) -> tuple[str, int, int]:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Build aligned Kikuyu-English Bible JSONL")
-    parser.add_argument("kikuyu", type=Path)
+    parser = argparse.ArgumentParser(description="Build aligned Language-English Bible JSONL")
+    parser.add_argument("language", type=Path)
     parser.add_argument("english", type=Path)
     parser.add_argument("output", type=Path)
     parser.add_argument("--translation-output", type=Path, help="Also write JSONL for training/train_translation.py")
@@ -87,20 +87,20 @@ def main() -> None:
 
     english_by_ref = {key(row): row for row in rows(args.english, "english")}
     result = []
-    for row in rows(args.kikuyu, "kikuyu"):
+    for row in rows(args.language, "language"):
         ref = key(row)
         english = english_by_ref.get(ref)
         if not english:
             continue
-        kikuyu_text = str(row.get("kikuyu", row.get("text", ""))).strip()
+        language_text = str(row.get("language", row.get("text", ""))).strip()
         english_text = str(english.get("english", english.get("text", ""))).strip()
-        if kikuyu_text and english_text:
+        if language_text and english_text:
             result.append(
                 {
                     "book": row["book"],
                     "chapter": ref[1],
                     "verse": ref[2],
-                    "kikuyu": kikuyu_text,
+                    "language": language_text,
                     "english": english_text,
                 }
             )
@@ -116,7 +116,7 @@ def main() -> None:
         args.translation_output.write_text(
             "".join(
                 json.dumps(
-                    {"kikuyu": row["kikuyu"], "english": row["english"], "split": "train"},
+                    {"language": row["language"], "english": row["english"], "split": "train"},
                     ensure_ascii=False,
                 )
                 + "\n"

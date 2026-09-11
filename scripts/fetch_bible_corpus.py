@@ -6,7 +6,7 @@ archives over HTTPS. Only openly licensed translations are listed here, and the
 license notice shipped inside each archive is copied next to the download so the
 attribution stays with the data.
 
-    python scripts/fetch_bible_corpus.py                # kikuyu + english defaults
+    python scripts/fetch_bible_corpus.py                # language + english defaults
     python scripts/fetch_bible_corpus.py --list
     python scripts/fetch_bible_corpus.py kik engwebp --output data/bible/raw
 
@@ -24,7 +24,7 @@ from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
 BASE_URL = "https://ebible.org/Scriptures/{code}_vpl.zip"
-USER_AGENT = "kikuyu-ai-corpus-fetcher/1.0"
+USER_AGENT = "language-ai-corpus-fetcher/1.0"
 
 
 @dataclass(frozen=True)
@@ -41,8 +41,8 @@ class Source:
 SOURCES: dict[str, Source] = {
     "kik": Source(
         "kik",
-        "kikuyu",
-        "Biblica Open Kikuyu Holy Word of God (2013)",
+        "language",
+        "Biblica Open Language Holy Word of God (2013)",
         "CC BY-SA 4.0 - attribution and share-alike required",
     ),
     "luo": Source(
@@ -83,7 +83,7 @@ SOURCES: dict[str, Source] = {
     ),
 }
 
-# Kikuyu and English by default; add "luo" for Dholuo.
+# Language and English by default; add "luo" for Dholuo.
 DEFAULT_CODES = ("kik", "engwebp")
 
 

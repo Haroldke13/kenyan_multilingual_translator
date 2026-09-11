@@ -15,17 +15,17 @@ from ..translator import save_correction
 
 settings = Settings.from_env()
 pipeline = Pipeline(settings)
-# Built once: phone keyboards have no tilde vowels, so typed Kikuyu needs
+# Built once: phone keyboards have no tilde vowels, so typed Language needs
 # its accents restored before the model sees it.
 LEXICON = load_lexicon(settings.bible)
-app = FastAPI(title="Kikuyu AI Translator", version="0.1.0")
+app = FastAPI(title="Language AI Translator", version="0.1.0")
 STATIC_DIR = Path(__file__).resolve().parent / "static"
 SESSION_FILE_NAMES = {
     "translation.mp3",
     "audio_clean.wav",
     "asr_segments.jsonl",
     "english_segments.jsonl",
-    "kikuyu.txt",
+    "language.txt",
     "english.txt",
     "subtitles.srt",
     "english_subtitles.srt",
@@ -46,7 +46,7 @@ ROOT_HTML = """<!doctype html>
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Kikuyu AI Translator</title>
+  <title>Language AI Translator</title>
   <style>
     :root {
       color-scheme: light dark;
@@ -141,7 +141,7 @@ ROOT_HTML = """<!doctype html>
 <body>
   <main>
     <div class="status"><span class="dot" aria-hidden="true"></span>API running</div>
-    <h1>Kikuyu AI Translator</h1>
+    <h1>Language AI Translator</h1>
     <p>This server accepts uploads at <code>POST /translate</code> and text at <code>POST /translate-text</code>.</p>
     <nav aria-label="API links">
       <a href="/health">Health</a>
@@ -232,7 +232,7 @@ def translate_text(item: TextTranslation) -> dict:
         if not settings.keep_translation_loaded:
             pipeline.translator.unload()
         return {
-            "kikuyu": text,
+            "language": text,
             "read_as": prepared if changes else None,
             "english": english,
             "translation_confidence": confidence,
@@ -322,7 +322,7 @@ def ensure_dev_certificate(directory: Path) -> tuple[Path, Path]:
         [
             "openssl", "req", "-x509", "-newkey", "rsa:2048", "-nodes",
             "-keyout", str(key), "-out", str(certificate),
-            "-days", "825", "-subj", "/CN=kikuyu-ai-local",
+            "-days", "825", "-subj", "/CN=language-ai-local",
             "-addext", "subjectAltName=" + ",".join(names),
         ],
         capture_output=True,
@@ -337,7 +337,7 @@ def ensure_dev_certificate(directory: Path) -> tuple[Path, Path]:
 def run() -> None:
     import argparse
 
-    parser = argparse.ArgumentParser(description="Serve the Kikuyu AI translator and its mobile app")
+    parser = argparse.ArgumentParser(description="Serve the Language AI translator and its mobile app")
     parser.add_argument("--host", default=settings.api_host, help="bind address (default: %(default)s)")
     parser.add_argument("--port", type=int, default=settings.api_port, help="bind port (default: %(default)s)")
     parser.add_argument("--lan", action="store_true", help="bind 0.0.0.0 so phones on the same network can connect")

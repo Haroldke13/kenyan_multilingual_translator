@@ -8,7 +8,7 @@ from pathlib import Path
 
 import pytest
 
-from kikuyu_ai.audio import (
+from language_ai.audio import (
     AUDIO_EXTENSIONS,
     SUPPORTED_EXTENSIONS,
     VIDEO_EXTENSIONS,
@@ -155,7 +155,7 @@ def test_named_extension_sets_cover_the_formats_phones_produce():
 
 def test_voice_files_offers_unknown_extensions_and_skips_sidecars(tmp_path: Path):
     """The scan must not pre-filter formats that ffmpeg could still decode."""
-    for name in ("clip.mp3", "clip.weirdformat", "recording", "clip.kikuyu.txt", ".hidden.mp3"):
+    for name in ("clip.mp3", "clip.weirdformat", "recording", "clip.language.txt", ".hidden.mp3"):
         (tmp_path / name).write_bytes(b"data")
 
     found = {path.name for path in voice_files(tmp_path)}

@@ -6,16 +6,16 @@ what finished in a state file next to the output, and picks up from the last
 completed clip on the next run.
 
     # split into 60-second clips and convert them
-    python -m kikuyu_ai.clipper sermon.mp4 --output data/clips/sermon --seconds 60
+    python -m language_ai.clipper sermon.mp4 --output data/clips/sermon --seconds 60
 
     # only the sections you care about
-    python -m kikuyu_ai.clipper sermon.mp4 --output data/clips/sermon \\
+    python -m language_ai.clipper sermon.mp4 --output data/clips/sermon \\
         --ranges 2:30-5:00,17:40-19:05
 
     # convert and translate, stopping and resuming as often as you like
-    python -m kikuyu_ai.clipper sermon.mp4 --output data/clips/sermon --translate
-    python -m kikuyu_ai.clipper sermon.mp4 --output data/clips/sermon --translate --resume
-    python -m kikuyu_ai.clipper sermon.mp4 --output data/clips/sermon --restart
+    python -m language_ai.clipper sermon.mp4 --output data/clips/sermon --translate
+    python -m language_ai.clipper sermon.mp4 --output data/clips/sermon --translate --resume
+    python -m language_ai.clipper sermon.mp4 --output data/clips/sermon --restart
 """
 
 from __future__ import annotations
@@ -99,7 +99,7 @@ class Clip:
     status: str = PENDING
     audio: str | None = None
     duration: float | None = None
-    kikuyu: str | None = None
+    language: str | None = None
     english: str | None = None
     error: str | None = None
 
@@ -258,7 +258,7 @@ class ClipSession:
                 clip.duration = extract_clip(self.source, target, clip.start, clip.end)
                 clip.audio = str(target)
                 if translate is not None:
-                    clip.kikuyu, clip.english = translate(target)
+                    clip.language, clip.english = translate(target)
                 clip.status = DONE
                 clip.error = None
             except Exception as exc:  # noqa: BLE001 - recorded, then move on
@@ -272,15 +272,15 @@ class ClipSession:
 
     def write_transcript(self) -> Path | None:
         """Join the finished clips into one transcript file, in time order."""
-        rows = [clip for clip in self.clips if clip.status == DONE and (clip.kikuyu or clip.english)]
+        rows = [clip for clip in self.clips if clip.status == DONE and (clip.language or clip.english)]
         if not rows:
             return None
         target = self.output / "transcript.txt"
         lines: list[str] = []
         for clip in rows:
             lines.append(f"[{format_time(clip.start)} - {format_time(clip.end)}]")
-            if clip.kikuyu:
-                lines.append(f"  kikuyu : {clip.kikuyu}")
+            if clip.language:
+                lines.append(f"  language : {clip.language}")
             if clip.english:
                 lines.append(f"  english: {clip.english}")
             lines.append("")
@@ -302,7 +302,7 @@ def build_translator(settings=None):
 
     def translate(clip_path: Path) -> tuple[str, str]:
         result = pipeline.run(clip_path)
-        return result.kikuyu, result.english
+        return result.language, result.english
 
     return translate
 

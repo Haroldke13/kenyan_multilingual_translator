@@ -28,7 +28,7 @@ class ASR:
         self.max_new_tokens = max(8, int(max_new_tokens or 96))
         self.no_repeat_ngram_size = max(0, int(no_repeat_ngram_size or 0))
         self.repetition_penalty = max(1.0, float(repetition_penalty or 1.0))
-        self.progress = os.environ.get("KIKUYU_ASR_PROGRESS", "").casefold() in {"1", "true", "yes", "on"}
+        self.progress = os.environ.get("LANGUAGE_ASR_PROGRESS", "").casefold() in {"1", "true", "yes", "on"}
         self._model = None
 
     def unload(self) -> None:
@@ -61,7 +61,7 @@ class ASR:
         """
         if not self.language:
             raise RuntimeError(
-                "The mms backend needs a language code (for example KIKUYU_ASR_LANGUAGE=luo); "
+                "The mms backend needs a language code (for example LANGUAGE_ASR_LANGUAGE=luo); "
                 "MMS selects its adapter by language."
             )
         audio_input = read_wav_array(audio)
@@ -316,4 +316,4 @@ class ASR:
             confidence = min(1.0, max(0.0, sum(1.0 + (s.confidence or -1.0) / 2 for s in segments) / len(segments))) if segments else 0.0
             return segments, confidence
         except ImportError as exc:
-            raise RuntimeError("Install the optional ML dependencies or set KIKUYU_ASR_MODEL only after installing faster-whisper") from exc
+            raise RuntimeError("Install the optional ML dependencies or set LANGUAGE_ASR_MODEL only after installing faster-whisper") from exc

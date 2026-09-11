@@ -15,7 +15,7 @@ def main():
     except ImportError as exc:
         raise SystemExit("Install sentence-transformers and numpy for embeddings") from exc
     records = [json.loads(x) for x in args.input.read_text(encoding="utf-8").splitlines() if x.strip()]
-    matrix = SentenceTransformer("sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2").encode([r["kikuyu"] for r in records], normalize_embeddings=True)
+    matrix = SentenceTransformer("sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2").encode([r["language"] for r in records], normalize_embeddings=True)
     np.savez_compressed(args.output, embeddings=matrix, records=np.array(records, dtype=object))
 
 

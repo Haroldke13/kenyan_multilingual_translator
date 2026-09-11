@@ -78,9 +78,9 @@ class Pipeline:
             if not self.settings.keep_asr_loaded:
                 self.asr.unload()
 
-            kikuyu = " ".join(s.text for s in segments).strip()
+            language = " ".join(s.text for s in segments).strip()
             self._write_segments_jsonl(segments, work_folder / "asr_segments.jsonl")
-            match = self.aligner.match(kikuyu)
+            match = self.aligner.match(language)
             english_segments = []
             if match:
                 english, tr_conf = match.english, match.score
@@ -89,7 +89,7 @@ class Pipeline:
             if not self.settings.keep_translation_loaded:
                 self.translator.unload()
 
-            (work_folder / "kikuyu.txt").write_text(kikuyu, encoding="utf-8")
+            (work_folder / "language.txt").write_text(language, encoding="utf-8")
             (work_folder / "english.txt").write_text(english, encoding="utf-8")
             write_srt(segments or [], work_folder / "subtitles.srt")
             self._write_segments_jsonl(english_segments, work_folder / "english_segments.jsonl")
@@ -98,7 +98,7 @@ class Pipeline:
             tts_target = work_folder / "translation.mp3"
             synthesized = synthesize(english, tts_target, self.settings.tts_command)
             metadata = {
-                "language": "kikuyu",
+                "language": "language",
                 "duration": round(duration, 3),
                 "speaker_count": None,
                 "translation_confidence": round(tr_conf, 3),
@@ -119,7 +119,7 @@ class Pipeline:
             original_name,
             "audio_clean.wav",
             "asr_segments.jsonl",
-            "kikuyu.txt",
+            "language.txt",
             "english.txt",
             "english_segments.jsonl",
             "english_subtitles.srt",
@@ -129,7 +129,7 @@ class Pipeline:
         files = {name: str(folder / name) for name in names if (folder / name).exists()}
         if synthesized:
             files["translation.mp3"] = str(folder / "translation.mp3")
-        return TranslationResult(session_id, kikuyu, english, segments, match, asr_conf, tr_conf, duration, files)
+        return TranslationResult(session_id, language, english, segments, match, asr_conf, tr_conf, duration, files)
 
     @staticmethod
     def _validate_session_id(session_id: str) -> str:

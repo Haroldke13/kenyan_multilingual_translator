@@ -71,14 +71,14 @@ def check_remote_api(api_url: str, timeout: float = 2.0) -> dict:
         method="GET",
         headers={
             "Accept": "application/json",
-            "User-Agent": "kikuyu-ai-client/0.1",
+            "User-Agent": "language-ai-client/0.1",
         },
     )
     return _request_json(request, timeout)
 
 
 def _multipart_audio_body(audio_path: Path) -> tuple[bytes, str]:
-    boundary = f"kikuyu-ai-{uuid.uuid4().hex}"
+    boundary = f"language-ai-{uuid.uuid4().hex}"
     filename = audio_path.name or "audio.wav"
     content_type = mimetypes.guess_type(filename)[0] or "application/octet-stream"
     header = (
@@ -110,10 +110,10 @@ def translate_audio_remote(
             "Content-Type": f"multipart/form-data; boundary={boundary}",
             "Content-Length": str(len(body)),
             "Accept": "application/json",
-            "User-Agent": "kikuyu-ai-client/0.1",
+            "User-Agent": "language-ai-client/0.1",
         },
     )
-    payload = _request_json(request, timeout or float(os.getenv("KIKUYU_API_TIMEOUT", "900")))
+    payload = _request_json(request, timeout or float(os.getenv("LANGUAGE_API_TIMEOUT", "900")))
     return absolutize_session_urls(api_url, payload)
 
 
@@ -126,8 +126,8 @@ def translate_text_remote(api_url: str, text: str, timeout: float | None = None)
         headers={
             "Content-Type": "application/json",
             "Accept": "application/json",
-            "User-Agent": "kikuyu-ai-client/0.1",
+            "User-Agent": "language-ai-client/0.1",
         },
     )
-    payload = _request_json(request, timeout or float(os.getenv("KIKUYU_API_TIMEOUT", "900")))
+    payload = _request_json(request, timeout or float(os.getenv("LANGUAGE_API_TIMEOUT", "900")))
     return absolutize_session_urls(api_url, payload)

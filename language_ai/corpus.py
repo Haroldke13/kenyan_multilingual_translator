@@ -1,4 +1,4 @@
-"""Shared text handling for building offline Kikuyu-English training corpora.
+"""Shared text handling for building offline Language-English training corpora.
 
 Everything here is pure standard library so corpus building works on a phone
 with no network access, no API keys, and no heavyweight NLP dependencies.
@@ -14,10 +14,10 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Iterable, Iterator, Sequence
 
-# Kikuyu is written with i/u tilde vowels and a small closed set of very common
+# Language is written with i/u tilde vowels and a small closed set of very common
 # grammatical words. English is detected from its own stopword set. Neither list
 # needs to be exhaustive; they only have to separate the two languages.
-KIKUYU_MARKERS = frozenset(
+LANGUAGE_MARKERS = frozenset(
     """
     na ni wa ya cia kia gia mu ria thi uria ati no ta ku ma ha we hindi ngai
     mwathani andu mundu iria ciake wake wao akia nigetha tondu niguo mwena
@@ -39,7 +39,7 @@ CONTROL = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]")
 
 
 def normalize_text(value: str) -> str:
-    """Collapse PDF/OCR whitespace damage without touching Kikuyu diacritics."""
+    """Collapse PDF/OCR whitespace damage without touching Language diacritics."""
     value = unicodedata.normalize("NFC", value or "")
     value = CONTROL.sub(" ", value)
     value = HYPHEN_BREAK.sub(r"\1\2", value)
@@ -79,74 +79,74 @@ def _words(value: str) -> list[str]:
 
 
 def language_scores(value: str) -> tuple[float, float]:
-    """Return (kikuyu_score, english_score) in 0..1 for a line of text."""
+    """Return (language_score, english_score) in 0..1 for a line of text."""
     words = _words(value)
     if not words:
         return 0.0, 0.0
-    kikuyu_hits = sum(1 for word in words if word in KIKUYU_MARKERS)
+    language_hits = sum(1 for word in words if word in LANGUAGE_MARKERS)
     english_hits = sum(1 for word in words if word in ENGLISH_MARKERS)
-    # Tilde vowels appear in Kikuyu only, so treat them as strong evidence.
+    # Tilde vowels appear in Language only, so treat them as strong evidence.
     tilde = sum(1 for char in value if char in "ĩũĨŨ")
-    kikuyu = (kikuyu_hits + min(tilde, len(words))) / len(words)
-    return min(1.0, kikuyu), min(1.0, english_hits / len(words))
+    language = (language_hits + min(tilde, len(words))) / len(words)
+    return min(1.0, language), min(1.0, english_hits / len(words))
 
 
 def guess_language(value: str) -> str:
-    """Return 'kikuyu', 'english', or 'unknown' for a line of text."""
-    kikuyu, english = language_scores(value)
-    if kikuyu >= english + 0.06 and kikuyu > 0.04:
-        return "kikuyu"
-    if english >= kikuyu + 0.06 and english > 0.04:
+    """Return 'language', 'english', or 'unknown' for a line of text."""
+    language, english = language_scores(value)
+    if language >= english + 0.06 and language > 0.04:
+        return "language"
+    if english >= language + 0.06 and english > 0.04:
         return "english"
     return "unknown"
 
 
 @dataclass(frozen=True)
 class Pair:
-    kikuyu: str
+    language: str
     english: str
     source: str = ""
     meta: dict = field(default_factory=dict)
 
     def row(self) -> dict:
-        row = {"kikuyu": self.kikuyu, "english": self.english}
+        row = {"language": self.language, "english": self.english}
         if self.source:
             row["source"] = self.source
         row.update(self.meta)
         return row
 
 
-def pair_key(kikuyu: str, english: str) -> tuple[str, str]:
-    return (" ".join(_words(kikuyu)), " ".join(_words(english)))
+def pair_key(language: str, english: str) -> tuple[str, str]:
+    return (" ".join(_words(language)), " ".join(_words(english)))
 
 
 def usable_pair(
-    kikuyu: str,
+    language: str,
     english: str,
     min_chars: int = 8,
     max_chars: int = 1200,
     max_length_ratio: float = 3.0,
 ) -> bool:
     """Reject pairs that would teach the model noise rather than translation."""
-    kikuyu, english = kikuyu.strip(), english.strip()
-    if not kikuyu or not english:
+    language, english = language.strip(), english.strip()
+    if not language or not english:
         return False
-    if len(kikuyu) < min_chars or len(english) < min_chars:
+    if len(language) < min_chars or len(english) < min_chars:
         return False
-    if len(kikuyu) > max_chars or len(english) > max_chars:
+    if len(language) > max_chars or len(english) > max_chars:
         return False
-    ratio = len(kikuyu) / max(1, len(english))
+    ratio = len(language) / max(1, len(english))
     if ratio > max_length_ratio or ratio < 1.0 / max_length_ratio:
         return False
     # An identical source and target is an extraction failure, not a translation.
-    return pair_key(kikuyu, english)[0] != pair_key(kikuyu, english)[1]
+    return pair_key(language, english)[0] != pair_key(language, english)[1]
 
 
 def dedupe(pairs: Iterable[Pair]) -> list[Pair]:
     seen: set[tuple[str, str]] = set()
     unique: list[Pair] = []
     for pair in pairs:
-        key = pair_key(pair.kikuyu, pair.english)
+        key = pair_key(pair.language, pair.english)
         if key in seen:
             continue
         seen.add(key)

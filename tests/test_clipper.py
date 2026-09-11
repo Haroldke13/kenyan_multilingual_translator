@@ -9,7 +9,7 @@ from pathlib import Path
 
 import pytest
 
-from kikuyu_ai.clipper import (
+from language_ai.clipper import (
     ClipSession,
     DONE,
     FAILED,

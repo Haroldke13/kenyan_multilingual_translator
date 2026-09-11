@@ -66,7 +66,7 @@ def read_runtime(models_dir: Path) -> dict:
 
 
 def _threads() -> int:
-    requested = os.environ.get("KIKUYU_THREADS")
+    requested = os.environ.get("LANGUAGE_THREADS")
     if requested and requested.isdigit():
         return max(1, int(requested))
     # Half the cores keeps the phone responsive and, more importantly, keeps CPU
@@ -154,9 +154,9 @@ class NeuralTranslator:
     def _encode(self, tokenizer, text: str, source_tag: str) -> list[str]:
         """Tokens with the source language forced to the one we asked for.
 
-        This checkpoint was fine-tuned on Kikuyu, so its tokenizer has kik_Latn
+        This checkpoint was fine-tuned on Language, so its tokenizer has kik_Latn
         baked into the post-processor and stamps it on every input regardless of
-        language. Left alone, Somali gets translated as though it were Kikuyu
+        language. Left alone, Somali gets translated as though it were Language
         and comes back as confident nonsense, so the tag is replaced rather than
         trusted.
         """

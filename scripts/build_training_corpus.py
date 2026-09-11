@@ -31,7 +31,7 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from kikuyu_ai.corpus import normalize_text, pair_key, read_jsonl, usable_pair, write_jsonl
+from language_ai.corpus import normalize_text, pair_key, read_jsonl, usable_pair, write_jsonl
 
 DEFAULT_INPUTS = (
     Path("data/translation/bible.jsonl"),
@@ -57,12 +57,12 @@ def load(path: Path, args) -> list[dict]:
     rows: list[dict] = []
     skipped = 0
     for row in read_jsonl(path):
-        kikuyu = normalize_text(str(row.get("kikuyu", "")))
+        language = normalize_text(str(row.get("language", "")))
         english = normalize_text(str(row.get("english", "")))
-        if not usable_pair(kikuyu, english, args.min_chars, args.max_chars, args.max_length_ratio):
+        if not usable_pair(language, english, args.min_chars, args.max_chars, args.max_length_ratio):
             skipped += 1
             continue
-        clean = {"kikuyu": kikuyu, "english": english}
+        clean = {"language": language, "english": english}
         if row.get("source"):
             clean["source"] = str(row["source"])
         else:
@@ -98,7 +98,7 @@ def main() -> None:
             "  python scripts/fetch_bible_corpus.py && python scripts/build_parallel_dataset.py \\\n"
             "      data/bible/raw/kik_vpl.zip data/bible/raw/engwebp_vpl.zip \\\n"
             "      data/bible/parallel.jsonl --translation-output data/translation/bible.jsonl\n"
-            "  python scripts/ingest_pdf_corpus.py paired KIKUYU.pdf ENGLISH.pdf\n"
+            "  python scripts/ingest_pdf_corpus.py paired LANGUAGE.pdf ENGLISH.pdf\n"
             "  python scripts/ingest_voice_corpus.py"
         )
     missing = [path for path in inputs if not path.is_file()]
@@ -116,7 +116,7 @@ def main() -> None:
     for path in inputs:
         weight = repeats.get(str(path), 1)
         for row in load(path, args):
-            key = pair_key(row["kikuyu"], row["english"])
+            key = pair_key(row["language"], row["english"])
             merged[key] = row
             weights[key] = weight
 
@@ -137,7 +137,7 @@ def main() -> None:
     eval_rows = [{**row, "split": "eval"} for row in unique[:eval_count]]
     train_rows: list[dict] = []
     for row in unique[eval_count:]:
-        copies = weights.get(pair_key(row["kikuyu"], row["english"]), 1)
+        copies = weights.get(pair_key(row["language"], row["english"]), 1)
         train_rows.extend({**row, "split": "train"} for _ in range(copies))
     rng.shuffle(train_rows)
 
@@ -150,7 +150,7 @@ def main() -> None:
     print("  by source: " + ", ".join(f"{name}={count}" for name, count in sources.most_common()))
     if verified:
         print(f"  human-verified rows: {verified}")
-    print(f"\nTrain with:\n  python training/train_translation.py {args.output} --output models/translation/kikuyu-english")
+    print(f"\nTrain with:\n  python training/train_translation.py {args.output} --output models/translation/language-english")
 
 
 if __name__ == "__main__":

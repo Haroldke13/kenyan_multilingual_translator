@@ -49,7 +49,7 @@ if ! "$PYTHON" -c 'import sys; raise SystemExit(0 if sys.version_info >= (3, 9) 
 fi
 
 # --- check the offline data actually came across ---------------------------
-if [ ! -f "$HERE/data/kikuyu/verses.jsonl.gz" ] && [ ! -f "$HERE/models/translation/config.json" ]; then
+if [ ! -f "$HERE/data/language/verses.jsonl.gz" ] && [ ! -f "$HERE/models/translation/config.json" ]; then
     cat <<'MSG'
 Warning: no offline data and no translation model were found in this folder.
 

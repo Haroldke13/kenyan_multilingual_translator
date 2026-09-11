@@ -1,6 +1,6 @@
 """Put back the accented letters a phone keyboard cannot type.
 
-Kikuyu and Kamba are written with ĩ and ũ, but almost nobody has those on a
+Language and Kamba are written with ĩ and ũ, but almost nobody has those on a
 phone keyboard, so people type "ruciu" for "rũciũ". To a translation model those
 are two different words, and the unaccented one usually comes back untranslated.
 
@@ -35,7 +35,7 @@ def is_accented(word: str) -> bool:
     """Whether the writer already typed the accents themselves.
 
     Asking whether folding changes the word covers any language's diacritics,
-    rather than hard-coding the two vowels Kikuyu happens to use.
+    rather than hard-coding the two vowels Language happens to use.
     """
     return fold(word) != word.casefold()
 

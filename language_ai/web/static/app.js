@@ -2,7 +2,7 @@
 
 const $ = (id) => document.getElementById(id);
 const MAX_RECORD_MS = 5 * 60 * 1000;
-const QUEUE_KEY = "kikuyu.pendingCorrections";
+const QUEUE_KEY = "language.pendingCorrections";
 
 const state = {
   file: null,
@@ -79,8 +79,8 @@ window.addEventListener("offline", () => setStatus("Offline — the app shell is
 
 function renderResult(payload) {
   state.lastResult = payload;
-  $("out-kikuyu").textContent = payload.kikuyu || "(nothing recognised)";
-  // Typed Kikuyu often lacks its tilde vowels; show what was actually translated.
+  $("out-language").textContent = payload.language || "(nothing recognised)";
+  // Typed Language often lacks its tilde vowels; show what was actually translated.
   const readAs = $("read-as");
   readAs.hidden = !payload.read_as;
   readAs.textContent = payload.read_as ? `Read as ${payload.read_as} — the tilde vowels were filled in.` : "";
@@ -103,7 +103,7 @@ function renderResult(payload) {
 
   const links = [];
   const urls = payload.file_urls || {};
-  if (urls["subtitles.srt"]) links.push(`<a href="${urls["subtitles.srt"]}" download>Kikuyu subtitles</a>`);
+  if (urls["subtitles.srt"]) links.push(`<a href="${urls["subtitles.srt"]}" download>Language subtitles</a>`);
   if (urls["english_subtitles.srt"]) links.push(`<a href="${urls["english_subtitles.srt"]}" download>English subtitles</a>`);
   $("downloads").innerHTML = links.join("");
 
@@ -152,7 +152,7 @@ async function translateText() {
     });
     if (!response.ok) throw new Error(await readError(response));
     const payload = await response.json();
-    renderResult({ kikuyu: payload.kikuyu, english: payload.english, bible_match: payload.bible_match });
+    renderResult({ language: payload.language, english: payload.english, bible_match: payload.bible_match });
   } catch (error) {
     showError(navigator.onLine
       ? String(error.message || error)
@@ -319,7 +319,7 @@ $("save-fix").addEventListener("click", async () => {
   const result = state.lastResult;
   const corrected = $("fix-text").value.trim();
   if (!result || !corrected) return;
-  const item = { source: result.kikuyu || "", machine: result.english || "", corrected };
+  const item = { source: result.language || "", machine: result.english || "", corrected };
   if (!item.source) {
     $("fix-status").textContent = "Nothing to correct yet.";
     return;

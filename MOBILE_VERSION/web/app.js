@@ -4,7 +4,7 @@
 // is to localhost and none of it needs a network.
 
 const $ = (id) => document.getElementById(id);
-const STORE_KEY = "kikuyu.language";
+const STORE_KEY = "language.language";
 
 const state = {
   languages: [],

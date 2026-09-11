@@ -1,14 +1,14 @@
-"""A Flask upload page for translating Kikuyu recordings into English.
+"""A Flask upload page for translating Language recordings into English.
 
     pip install -e '.[flask,ml]'
-    python -m kikuyu_ai.web.flask_app --lan
+    python -m language_ai.web.flask_app --lan
 
 Transcription runs for far longer than a browser will wait on a form post, so an
 upload starts a background job and the result page polls until it is done. Only
 one job decodes at a time: the models are large and running two at once would
 load several gigabytes twice over.
 
-Set KIKUYU_API_URL to send uploads to a FastAPI server instead of loading the
+Set LANGUAGE_API_URL to send uploads to a FastAPI server instead of loading the
 models in this process.
 """
 
@@ -118,7 +118,7 @@ def create_app(settings: Settings | None = None) -> Flask:
             if settings.api_url:
                 payload = translate_audio_remote(settings.api_url, temporary)
                 return {
-                    "source_text": payload.get("kikuyu", ""),
+                    "source_text": payload.get("language", ""),
                     "language": language.code,
                     "language_name": language.name,
                     "english": payload.get("english", ""),
@@ -129,7 +129,7 @@ def create_app(settings: Settings | None = None) -> Flask:
                 }
             result = pipeline(language).run(temporary)
             return {
-                "source_text": result.kikuyu,
+                "source_text": result.language,
                 "language": language.code,
                 "language_name": language.name,
                 "english": result.english,
@@ -313,7 +313,7 @@ def create_app(settings: Settings | None = None) -> Flask:
 
 
 def run() -> None:
-    parser = argparse.ArgumentParser(description="Flask upload page for the Kikuyu translator")
+    parser = argparse.ArgumentParser(description="Flask upload page for the Language translator")
     parser.add_argument("--host", default="127.0.0.1")
     parser.add_argument("--port", type=int, default=5000)
     parser.add_argument("--lan", action="store_true", help="bind 0.0.0.0 so other devices can reach it")

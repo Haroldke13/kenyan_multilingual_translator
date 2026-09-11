@@ -1,14 +1,14 @@
 import json
 import wave
 from pathlib import Path
-from kikuyu_ai.audio import normalize_audio
-from kikuyu_ai.asr import ASR
-from kikuyu_ai.config import Settings
-from kikuyu_ai.outputs import srt_timestamp
-from kikuyu_ai.pipeline import Pipeline
-from kikuyu_ai import remote
-from kikuyu_ai.remote import absolutize_session_urls, check_remote_api
-from kikuyu_ai.translator import BibleAligner, save_correction
+from language_ai.audio import normalize_audio
+from language_ai.asr import ASR
+from language_ai.config import Settings
+from language_ai.outputs import srt_timestamp
+from language_ai.pipeline import Pipeline
+from language_ai import remote
+from language_ai.remote import absolutize_session_urls, check_remote_api
+from language_ai.translator import BibleAligner, save_correction
 from scripts.build_bible_asr_manifest import build_rows, read_readaloud_zip
 from scripts.build_youversion_audio_manifest import canonical_chapters, extract_audio_url
 from scripts.download_bible_audio import destination_for
@@ -22,7 +22,7 @@ def test_timestamp():
 def test_bible_match(tmp_path: Path):
     bible = tmp_path / "bible"
     bible.mkdir()
-    (bible / "parallel.jsonl").write_text(json.dumps({"book":"John", "chapter":3, "verse":16, "kikuyu":"Ngai nĩwendete kĩrĩndĩ", "english":"For God so loved the world"}) + "\n", encoding="utf-8")
+    (bible / "parallel.jsonl").write_text(json.dumps({"book":"John", "chapter":3, "verse":16, "language":"Ngai nĩwendete kĩrĩndĩ", "english":"For God so loved the world"}) + "\n", encoding="utf-8")
     match = BibleAligner(bible, threshold=.4).match("Ngai nĩwendete kĩrĩndĩ")
     assert match and match.book == "John" and match.verse == 16
 
@@ -34,45 +34,45 @@ def test_correction(tmp_path: Path):
 
 def test_settings_loads_model_env_file(tmp_path: Path, monkeypatch):
     for key in (
-        "KIKUYU_API_URL",
-        "KIKUYU_API_HOST",
-        "KIKUYU_API_PORT",
-        "KIKUYU_ASR_BACKEND",
-        "KIKUYU_ASR_MODEL",
-        "KIKUYU_ASR_LANGUAGE",
-        "KIKUYU_TRANSLATION_MODEL",
-        "KIKUYU_TRANSLATION_SRC_LANG",
-        "KIKUYU_TRANSLATION_TGT_LANG",
-        "KIKUYU_ASR_CHUNK_SECONDS",
-        "KIKUYU_ASR_RETRY_CHUNK_SECONDS",
-        "KIKUYU_ASR_SILENCE_RMS",
-        "KIKUYU_ASR_MAX_NEW_TOKENS",
-        "KIKUYU_ASR_NO_REPEAT_NGRAM_SIZE",
-        "KIKUYU_ASR_REPETITION_PENALTY",
-        "KIKUYU_TRANSLATION_MAX_NEW_TOKENS",
-        "KIKUYU_KEEP_ASR_LOADED",
-        "KIKUYU_KEEP_TRANSLATION_LOADED",
+        "LANGUAGE_API_URL",
+        "LANGUAGE_API_HOST",
+        "LANGUAGE_API_PORT",
+        "LANGUAGE_ASR_BACKEND",
+        "LANGUAGE_ASR_MODEL",
+        "LANGUAGE_ASR_LANGUAGE",
+        "LANGUAGE_TRANSLATION_MODEL",
+        "LANGUAGE_TRANSLATION_SRC_LANG",
+        "LANGUAGE_TRANSLATION_TGT_LANG",
+        "LANGUAGE_ASR_CHUNK_SECONDS",
+        "LANGUAGE_ASR_RETRY_CHUNK_SECONDS",
+        "LANGUAGE_ASR_SILENCE_RMS",
+        "LANGUAGE_ASR_MAX_NEW_TOKENS",
+        "LANGUAGE_ASR_NO_REPEAT_NGRAM_SIZE",
+        "LANGUAGE_ASR_REPETITION_PENALTY",
+        "LANGUAGE_TRANSLATION_MAX_NEW_TOKENS",
+        "LANGUAGE_KEEP_ASR_LOADED",
+        "LANGUAGE_KEEP_TRANSLATION_LOADED",
     ):
         monkeypatch.delenv(key, raising=False)
     (tmp_path / ".env").write_text(
         "\n".join(
             [
-                "KIKUYU_API_URL=https://api.example.test",
-                "KIKUYU_API_HOST=0.0.0.0",
-                "KIKUYU_API_PORT=9001",
-                "KIKUYU_ASR_BACKEND=transformers",
-                "KIKUYU_ASR_MODEL=example/asr",
-                "KIKUYU_TRANSLATION_MODEL=example/translation",
-                "KIKUYU_TRANSLATION_SRC_LANG=kik_Latn",
-                "KIKUYU_TRANSLATION_TGT_LANG=eng_Latn",
-                "KIKUYU_ASR_CHUNK_SECONDS=7.5",
-                "KIKUYU_ASR_RETRY_CHUNK_SECONDS=3.5",
-                "KIKUYU_ASR_SILENCE_RMS=0.002",
-                "KIKUYU_ASR_MAX_NEW_TOKENS=77",
-                "KIKUYU_ASR_NO_REPEAT_NGRAM_SIZE=4",
-                "KIKUYU_ASR_REPETITION_PENALTY=1.2",
-                "KIKUYU_TRANSLATION_MAX_NEW_TOKENS=99",
-                "KIKUYU_KEEP_ASR_LOADED=true",
+                "LANGUAGE_API_URL=https://api.example.test",
+                "LANGUAGE_API_HOST=0.0.0.0",
+                "LANGUAGE_API_PORT=9001",
+                "LANGUAGE_ASR_BACKEND=transformers",
+                "LANGUAGE_ASR_MODEL=example/asr",
+                "LANGUAGE_TRANSLATION_MODEL=example/translation",
+                "LANGUAGE_TRANSLATION_SRC_LANG=kik_Latn",
+                "LANGUAGE_TRANSLATION_TGT_LANG=eng_Latn",
+                "LANGUAGE_ASR_CHUNK_SECONDS=7.5",
+                "LANGUAGE_ASR_RETRY_CHUNK_SECONDS=3.5",
+                "LANGUAGE_ASR_SILENCE_RMS=0.002",
+                "LANGUAGE_ASR_MAX_NEW_TOKENS=77",
+                "LANGUAGE_ASR_NO_REPEAT_NGRAM_SIZE=4",
+                "LANGUAGE_ASR_REPETITION_PENALTY=1.2",
+                "LANGUAGE_TRANSLATION_MAX_NEW_TOKENS=99",
+                "LANGUAGE_KEEP_ASR_LOADED=true",
             ]
         ),
         encoding="utf-8",
@@ -117,8 +117,8 @@ def test_wav_normalization_writes_pcm16(tmp_path: Path):
 
 
 def test_pipeline_writes_complete_session_atomically(tmp_path: Path, monkeypatch):
-    monkeypatch.setenv("KIKUYU_ASR_MODEL", "")
-    monkeypatch.setenv("KIKUYU_TRANSLATION_MODEL", "")
+    monkeypatch.setenv("LANGUAGE_ASR_MODEL", "")
+    monkeypatch.setenv("LANGUAGE_TRANSLATION_MODEL", "")
     source = tmp_path / "source.wav"
     with wave.open(str(source), "wb") as handle:
         handle.setnchannels(1)
@@ -133,14 +133,14 @@ def test_pipeline_writes_complete_session_atomically(tmp_path: Path, monkeypatch
     assert folder.exists()
     assert result.files["metadata.json"] == str(folder / "metadata.json")
     assert any((folder / name).exists() for name in ("audio_original.mp3", "audio_original.wav"))
-    for name in ("audio_clean.wav", "asr_segments.jsonl", "english_segments.jsonl", "kikuyu.txt", "english.txt", "subtitles.srt", "metadata.json"):
+    for name in ("audio_clean.wav", "asr_segments.jsonl", "english_segments.jsonl", "language.txt", "english.txt", "subtitles.srt", "metadata.json"):
         assert (folder / name).exists()
     assert not list(settings.sessions.glob(".atomic-session.*"))
 
 
 def test_pipeline_rejects_unsafe_session_id(tmp_path: Path, monkeypatch):
-    monkeypatch.setenv("KIKUYU_ASR_MODEL", "")
-    monkeypatch.setenv("KIKUYU_TRANSLATION_MODEL", "")
+    monkeypatch.setenv("LANGUAGE_ASR_MODEL", "")
+    monkeypatch.setenv("LANGUAGE_TRANSLATION_MODEL", "")
     source = tmp_path / "source.wav"
     with wave.open(str(source), "wb") as handle:
         handle.setnchannels(1)
@@ -266,14 +266,14 @@ def test_remote_client_absolutizes_session_urls():
     payload = {
         "audio": "/sessions/abc/translation.mp3",
         "subtitles": "/sessions/abc/subtitles.srt",
-        "file_urls": {"kikuyu.txt": "/sessions/abc/kikuyu.txt", "external": "https://cdn.example/x"},
+        "file_urls": {"language.txt": "/sessions/abc/language.txt", "external": "https://cdn.example/x"},
     }
 
     result = absolutize_session_urls("https://server.example/api", payload)
 
     assert result["audio"] == "https://server.example/api/sessions/abc/translation.mp3"
     assert result["subtitles"] == "https://server.example/api/sessions/abc/subtitles.srt"
-    assert result["file_urls"]["kikuyu.txt"] == "https://server.example/api/sessions/abc/kikuyu.txt"
+    assert result["file_urls"]["language.txt"] == "https://server.example/api/sessions/abc/language.txt"
     assert result["file_urls"]["external"] == "https://cdn.example/x"
 
 

@@ -8,9 +8,9 @@ import pytest
 
 pytest.importorskip("flask")
 
-from kikuyu_ai.config import Settings
-from kikuyu_ai.models import BibleMatch, TranslationResult
-from kikuyu_ai.web import flask_app
+from language_ai.config import Settings
+from language_ai.models import BibleMatch, TranslationResult
+from language_ai.web import flask_app
 
 
 @pytest.fixture
@@ -18,7 +18,7 @@ def settings(tmp_path: Path) -> Settings:
     base = Settings.from_env()
     # Make the shared speech model look installed, so the upload form is offered.
     # MMS needs the encoder folder *and* each language's adapter beside it.
-    from kikuyu_ai.languages import LANGUAGES, MMS_MODEL
+    from language_ai.languages import LANGUAGES, MMS_MODEL
 
     folder = tmp_path / MMS_MODEL
     folder.mkdir(parents=True, exist_ok=True)
@@ -50,7 +50,7 @@ class StubPipeline:
         (folder / "subtitles.srt").write_text("1\n", encoding="utf-8")
         return TranslationResult(
             session_id="session-1",
-            kikuyu="Ngai nĩ mwega",
+            language="Ngai nĩ mwega",
             english="God is good",
             segments=[],
             bible_match=BibleMatch("GEN", 1, 1, "Kĩambĩrĩria", "In the beginning", 0.9),
@@ -152,7 +152,7 @@ def test_a_known_verse_is_returned_as_published_not_machine_translated(settings:
     (settings.bible / "parallel.jsonl").write_text(
         json.dumps(
             {"book": "GEN", "chapter": 1, "verse": 1,
-             "kikuyu": "Kĩambĩrĩria", "english": "In the beginning"},
+             "language": "Kĩambĩrĩria", "english": "In the beginning"},
             ensure_ascii=False,
         ) + "\n",
         encoding="utf-8",
@@ -175,7 +175,7 @@ def test_empty_text_is_rejected(client):
     response = submit_text(client, "   ")
 
     assert response.status_code == 400
-    assert "Type some Kikuyu text first." in response.get_data(as_text=True)
+    assert "Type some Language text first." in response.get_data(as_text=True)
 
 
 def test_very_long_text_is_refused_rather_than_silently_truncated(client):

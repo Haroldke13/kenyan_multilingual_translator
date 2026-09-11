@@ -1,10 +1,10 @@
-"""Restore Kikuyu tilde vowels on text that was typed without them.
+"""Restore Language tilde vowels on text that was typed without them.
 
-Kikuyu is written with ĩ and ũ, but phone keyboards rarely have them, so people
+Language is written with ĩ and ũ, but phone keyboards rarely have them, so people
 type "ruciu" for "rũciũ". The translation model treats those as different words
 and often just echoes the unaccented one back untranslated.
 
-The aligned Bible corpus is 31k verses of correctly accented Kikuyu, so it can
+The aligned Bible corpus is 31k verses of correctly accented Language, so it can
 say what the accented spelling of a folded word normally is. Nothing here needs a
 network connection or a model: it is a lookup table built from local data.
 """
@@ -48,7 +48,7 @@ def build_lexicon(texts) -> dict[str, str]:
     return lexicon
 
 
-def kikuyu_texts(bible_dir: Path):
+def language_texts(bible_dir: Path):
     path = bible_dir / "parallel.jsonl"
     if not path.is_file():
         return
@@ -60,7 +60,7 @@ def kikuyu_texts(bible_dir: Path):
                 row = json.loads(line)
             except json.JSONDecodeError:
                 continue
-            text = row.get("kikuyu")
+            text = row.get("language")
             if text:
                 yield str(text)
 
@@ -81,7 +81,7 @@ def load_lexicon(bible_dir: Path, rebuild: bool = False) -> dict[str, str]:
         except (json.JSONDecodeError, OSError):
             pass  # a damaged cache is rebuilt rather than fatal
 
-    lexicon = build_lexicon(kikuyu_texts(bible_dir))
+    lexicon = build_lexicon(language_texts(bible_dir))
     try:
         cache.write_text(
             json.dumps({"signature": signature, "words": lexicon}, ensure_ascii=False),

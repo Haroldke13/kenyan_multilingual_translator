@@ -114,7 +114,7 @@ class JobStore:
 
 
 class Handler(BaseHTTPRequestHandler):
-    server_version = "KikuyuMobile/1.0"
+    server_version = "LanguageMobile/1.0"
     engine: Engine
     jobs: JobStore
     uploads: Path
@@ -367,7 +367,7 @@ def warm(root: Path) -> None:
 
 
 def run(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description="Translate Kikuyu, Kamba, Oromo and Somali on your phone.")
+    parser = argparse.ArgumentParser(description="Translate Language, Kamba, Oromo and Somali on your phone.")
     parser.add_argument("--port", type=int, default=8600)
     parser.add_argument("--host", default="127.0.0.1", help="use 0.0.0.0 to let other devices connect")
     parser.add_argument("--lan", action="store_true", help="shorthand for --host 0.0.0.0")
@@ -376,7 +376,7 @@ def run(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
 
     host = "0.0.0.0" if args.lan else args.host
-    uploads = Path(tempfile.mkdtemp(prefix="kikuyu-uploads-"))
+    uploads = Path(tempfile.mkdtemp(prefix="language-uploads-"))
     handler = build(ROOT, uploads, args.max_upload_mb)
 
     server = ThreadingHTTPServer((host, args.port), handler)
@@ -385,7 +385,7 @@ def run(argv: list[str] | None = None) -> int:
     capabilities = handler.engine.capabilities()
     ready = [name for name, info in capabilities["languages"].items() if info["verses"] or info["neural"]]
     print("", flush=True)
-    print("  Kikuyu / Kamba / Oromo / Somali → English", flush=True)
+    print("  Language / Kamba / Oromo / Somali → English", flush=True)
     print(f"  Open this on the phone:  http://localhost:{args.port}", flush=True)
     if host == "0.0.0.0":
         for address in local_addresses():

@@ -78,7 +78,7 @@ def extract_audio_url(page_html: str, version_id: int | str) -> str | None:
 
 
 def fetch_text(url: str) -> str:
-    request = Request(url, headers={"User-Agent": "kikuyu-ai-data-builder/0.1"})
+    request = Request(url, headers={"User-Agent": "language-ai-data-builder/0.1"})
     with urlopen(request, timeout=120) as response:
         return response.read().decode("utf-8", errors="replace")
 

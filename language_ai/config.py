@@ -4,8 +4,8 @@ import os
 
 
 DEFAULT_ASR_BACKEND = "transformers"
-DEFAULT_ASR_MODEL = "Kiragu/whisper-small-kikuyu-v5"
-DEFAULT_TRANSLATION_MODEL = "nickdee96/nllb-200-600m-kikuyu-english"
+DEFAULT_ASR_MODEL = "Kiragu/whisper-small-language-v5"
+DEFAULT_TRANSLATION_MODEL = "nickdee96/nllb-200-600m-language-english"
 DEFAULT_TRANSLATION_SRC_LANG = "kik_Latn"
 DEFAULT_TRANSLATION_TGT_LANG = "eng_Latn"
 DEFAULT_ASR_CHUNK_SECONDS = 12.0
@@ -109,26 +109,26 @@ class Settings:
             sessions=base / "data" / "sessions",
             bible=base / "data" / "bible",
             corrections_db=base / "data" / "corrections.db",
-            api_url=_env_optional(env, "KIKUYU_API_URL"),
-            api_host=env.get("KIKUYU_API_HOST", "127.0.0.1"),
-            api_port=_env_int(env, "KIKUYU_API_PORT", 8000),
-            asr_backend=env.get("KIKUYU_ASR_BACKEND", DEFAULT_ASR_BACKEND),
-            asr_model=_env_model(env, "KIKUYU_ASR_MODEL", base, DEFAULT_ASR_MODEL),
-            asr_language=_env_optional(env, "KIKUYU_ASR_LANGUAGE"),
-            asr_chunk_seconds=_env_float(env, "KIKUYU_ASR_CHUNK_SECONDS", DEFAULT_ASR_CHUNK_SECONDS),
-            asr_retry_chunk_seconds=_env_float(env, "KIKUYU_ASR_RETRY_CHUNK_SECONDS", DEFAULT_ASR_RETRY_CHUNK_SECONDS),
-            asr_silence_rms=_env_float(env, "KIKUYU_ASR_SILENCE_RMS", DEFAULT_ASR_SILENCE_RMS),
-            asr_max_new_tokens=_env_int(env, "KIKUYU_ASR_MAX_NEW_TOKENS", DEFAULT_ASR_MAX_NEW_TOKENS),
-            asr_no_repeat_ngram_size=_env_int(env, "KIKUYU_ASR_NO_REPEAT_NGRAM_SIZE", DEFAULT_ASR_NO_REPEAT_NGRAM_SIZE),
-            asr_repetition_penalty=_env_float(env, "KIKUYU_ASR_REPETITION_PENALTY", DEFAULT_ASR_REPETITION_PENALTY),
-            translation_model=_env_model(env, "KIKUYU_TRANSLATION_MODEL", base, DEFAULT_TRANSLATION_MODEL),
-            translation_src_lang=_env_optional(env, "KIKUYU_TRANSLATION_SRC_LANG", DEFAULT_TRANSLATION_SRC_LANG),
-            translation_tgt_lang=_env_optional(env, "KIKUYU_TRANSLATION_TGT_LANG", DEFAULT_TRANSLATION_TGT_LANG),
-            translation_max_new_tokens=_env_int(env, "KIKUYU_TRANSLATION_MAX_NEW_TOKENS", DEFAULT_TRANSLATION_MAX_NEW_TOKENS),
-            keep_asr_loaded=_env_bool(env, "KIKUYU_KEEP_ASR_LOADED"),
-            keep_translation_loaded=_env_bool(env, "KIKUYU_KEEP_TRANSLATION_LOADED"),
-            tts_command=_env_optional(env, "KIKUYU_TTS_COMMAND"),
-            max_upload_mb=int(env.get("KIKUYU_MAX_UPLOAD_MB", "512")),
+            api_url=_env_optional(env, "LANGUAGE_API_URL"),
+            api_host=env.get("LANGUAGE_API_HOST", "127.0.0.1"),
+            api_port=_env_int(env, "LANGUAGE_API_PORT", 8000),
+            asr_backend=env.get("LANGUAGE_ASR_BACKEND", DEFAULT_ASR_BACKEND),
+            asr_model=_env_model(env, "LANGUAGE_ASR_MODEL", base, DEFAULT_ASR_MODEL),
+            asr_language=_env_optional(env, "LANGUAGE_ASR_LANGUAGE"),
+            asr_chunk_seconds=_env_float(env, "LANGUAGE_ASR_CHUNK_SECONDS", DEFAULT_ASR_CHUNK_SECONDS),
+            asr_retry_chunk_seconds=_env_float(env, "LANGUAGE_ASR_RETRY_CHUNK_SECONDS", DEFAULT_ASR_RETRY_CHUNK_SECONDS),
+            asr_silence_rms=_env_float(env, "LANGUAGE_ASR_SILENCE_RMS", DEFAULT_ASR_SILENCE_RMS),
+            asr_max_new_tokens=_env_int(env, "LANGUAGE_ASR_MAX_NEW_TOKENS", DEFAULT_ASR_MAX_NEW_TOKENS),
+            asr_no_repeat_ngram_size=_env_int(env, "LANGUAGE_ASR_NO_REPEAT_NGRAM_SIZE", DEFAULT_ASR_NO_REPEAT_NGRAM_SIZE),
+            asr_repetition_penalty=_env_float(env, "LANGUAGE_ASR_REPETITION_PENALTY", DEFAULT_ASR_REPETITION_PENALTY),
+            translation_model=_env_model(env, "LANGUAGE_TRANSLATION_MODEL", base, DEFAULT_TRANSLATION_MODEL),
+            translation_src_lang=_env_optional(env, "LANGUAGE_TRANSLATION_SRC_LANG", DEFAULT_TRANSLATION_SRC_LANG),
+            translation_tgt_lang=_env_optional(env, "LANGUAGE_TRANSLATION_TGT_LANG", DEFAULT_TRANSLATION_TGT_LANG),
+            translation_max_new_tokens=_env_int(env, "LANGUAGE_TRANSLATION_MAX_NEW_TOKENS", DEFAULT_TRANSLATION_MAX_NEW_TOKENS),
+            keep_asr_loaded=_env_bool(env, "LANGUAGE_KEEP_ASR_LOADED"),
+            keep_translation_loaded=_env_bool(env, "LANGUAGE_KEEP_TRANSLATION_LOADED"),
+            tts_command=_env_optional(env, "LANGUAGE_TTS_COMMAND"),
+            max_upload_mb=int(env.get("LANGUAGE_MAX_UPLOAD_MB", "512")),
         )
 
     def ensure_dirs(self) -> None:

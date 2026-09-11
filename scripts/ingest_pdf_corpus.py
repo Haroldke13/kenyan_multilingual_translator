@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""Turn PDF translations into Kikuyu-English training rows, fully offline.
+"""Turn PDF translations into Language-English training rows, fully offline.
 
 Two layouts are supported:
 
   Paired documents - the same book as two PDFs, one per language:
-      python scripts/ingest_pdf_corpus.py paired kikuyu.pdf english.pdf \
+      python scripts/ingest_pdf_corpus.py paired language.pdf english.pdf \
           --output data/translation/pdf.jsonl
 
   Bilingual document - one PDF holding both languages (facing columns,
@@ -31,7 +31,7 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from kikuyu_ai.corpus import (
+from language_ai.corpus import (
     Pair,
     align_blocks,
     dedupe,
@@ -113,14 +113,14 @@ def sentences_from_pdf(pdf: Path, args) -> list[str]:
 
 
 def pairs_from_paired(args) -> list[Pair]:
-    kikuyu = sentences_from_pdf(args.kikuyu_pdf, args)
+    language = sentences_from_pdf(args.language_pdf, args)
     english = sentences_from_pdf(args.english_pdf, args)
-    print(f"{args.kikuyu_pdf.name}: {len(kikuyu)} sentences", file=sys.stderr)
+    print(f"{args.language_pdf.name}: {len(language)} sentences", file=sys.stderr)
     print(f"{args.english_pdf.name}: {len(english)} sentences", file=sys.stderr)
-    source = f"pdf:{args.kikuyu_pdf.name}|{args.english_pdf.name}"
+    source = f"pdf:{args.language_pdf.name}|{args.english_pdf.name}"
     return [
         Pair(left, right, source)
-        for left, right in align_blocks(kikuyu, english)
+        for left, right in align_blocks(language, english)
     ]
 
 
@@ -156,7 +156,7 @@ def pair_language_runs(runs: list[tuple[str, list[str]]], source: str = "") -> l
             next_language, next_block = runs[index + 1]
             if language == next_language:
                 continue
-            left, right = (block, next_block) if language == "kikuyu" else (next_block, block)
+            left, right = (block, next_block) if language == "language" else (next_block, block)
             # Same-size runs align one to one; otherwise fall back to length alignment.
             if len(left) == len(right):
                 collected.extend(Pair(a, b, source) for a, b in zip(left, right))
@@ -176,9 +176,9 @@ def phase_score(pairs: list[Pair]) -> float:
     """Total length balance across pairs; higher means a better interleaving."""
     total = 0.0
     for pair in pairs:
-        longest = max(len(pair.kikuyu), len(pair.english))
+        longest = max(len(pair.language), len(pair.english))
         if longest:
-            total += min(len(pair.kikuyu), len(pair.english)) / longest
+            total += min(len(pair.language), len(pair.english)) / longest
     return total
 
 
@@ -202,7 +202,7 @@ def main() -> None:
 
     modes = parser.add_subparsers(dest="mode", required=True)
     paired = modes.add_parser("paired", help="two PDFs of the same document, one per language")
-    paired.add_argument("kikuyu_pdf", type=Path)
+    paired.add_argument("language_pdf", type=Path)
     paired.add_argument("english_pdf", type=Path)
     bilingual = modes.add_parser("bilingual", help="one PDF containing both languages")
     bilingual.add_argument("pdf", type=Path)
@@ -213,11 +213,11 @@ def main() -> None:
     kept = dedupe(
         pair
         for pair in pairs
-        if usable_pair(pair.kikuyu, pair.english, args.min_chars, args.max_chars, args.max_length_ratio)
+        if usable_pair(pair.language, pair.english, args.min_chars, args.max_chars, args.max_length_ratio)
     )
     rows = [pair.row() for pair in kept]
     if args.append and args.output.exists():
-        from kikuyu_ai.corpus import read_jsonl
+        from language_ai.corpus import read_jsonl
 
         rows = list(read_jsonl(args.output)) + rows
 
@@ -227,7 +227,7 @@ def main() -> None:
     if kept:
         print("Check a few rows before training; misaligned PDFs teach the model wrong pairs:")
         for pair in kept[: min(3, len(kept))]:
-            print(f"  kikuyu: {pair.kikuyu[:70]}")
+            print(f"  language: {pair.language[:70]}")
             print(f"  english: {pair.english[:70]}")
 
 

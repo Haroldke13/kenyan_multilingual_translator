@@ -1,6 +1,6 @@
 # MOBILE_VERSION — translate on the phone, with the computer switched off
 
-Kikuyu, Kamba, Oromo and Somali into English, running entirely on an Android
+Language, Kamba, Oromo and Somali into English, running entirely on an Android
 phone. No internet, no API keys, no computer.
 
 Copy this folder to the phone, run `./start.sh`, open `http://localhost:8600`.
@@ -33,7 +33,7 @@ Measured on the packing computer — a phone is roughly 3–5× slower:
 
 | | Verse lookup | Word list | Spelling repair | Translation | Speech |
 |---|---|---|---|---|---|
-| **Kikuyu** | 31,094 verses | 42,321 words | 41,164 spellings | yes | yes |
+| **Language** | 31,094 verses | 42,321 words | 41,164 spellings | yes | yes |
 | **Kamba** | — | — | — | yes | yes |
 | **Oromo** | 31,094 verses | 29,951 words | not needed | yes | yes |
 | **Somali** | 31,095 verses | 33,687 words | not needed | yes | yes |
@@ -42,7 +42,7 @@ Measured on the packing computer — a phone is roughly 3–5× slower:
 so there is nothing to build a verse index or word list from. Kamba works only
 with the translation model installed; without it the app says so rather than
 guessing. Oromo and Somali need no spelling repair because they are written
-without the accented vowels Kikuyu uses.
+without the accented vowels Language uses.
 
 ## Installing
 
@@ -122,7 +122,7 @@ phantom process killer.
 
 No microphone recording over a network address — that needs `localhost` or
 HTTPS, and on the phone you are on `localhost`, so it works. Translating *into*
-Kikuyu is not supported; the model is trained one way, into English.
+Language is not supported; the model is trained one way, into English.
 
 ## Folder map
 
@@ -162,7 +162,7 @@ weights: four languages would mean four separate exports of about a gigabyte
 each, and CTranslate2's wav2vec2 converter silently drops adapters entirely.
 
 The NLLB tokenizer has `kik_Latn` **hard-coded** in its post-processor, because
-the checkpoint was fine-tuned on Kikuyu. `neural.py` overwrites that tag on
-every request. Without it, Somali is translated as though it were Kikuyu and
+the checkpoint was fine-tuned on Language. `neural.py` overwrites that tag on
+every request. Without it, Somali is translated as though it were Language and
 Genesis 1:1 comes back as *"It has been discovered that God has given birth to
 that plant."*

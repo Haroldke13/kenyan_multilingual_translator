@@ -1,4 +1,4 @@
-from kikuyu_ai.cli import main
+from language_ai.cli import main
 
 if __name__ == "__main__":
     main()

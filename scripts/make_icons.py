@@ -3,7 +3,7 @@
 
     python scripts/make_icons.py
 
-Writes 192px, 512px and a maskable 512px icon into kikuyu_ai/web/static/icons.
+Writes 192px, 512px and a maskable 512px icon into language_ai/web/static/icons.
 """
 
 from __future__ import annotations
@@ -15,7 +15,7 @@ from pathlib import Path
 BRAND = (15, 118, 110)
 BRAND_DARK = (11, 92, 86)
 INK = (255, 255, 255)
-OUTPUT = Path(__file__).resolve().parents[1] / "kikuyu_ai" / "web" / "static" / "icons"
+OUTPUT = Path(__file__).resolve().parents[1] / "language_ai" / "web" / "static" / "icons"
 
 # A speech waveform: relative bar heights across the middle of the icon.
 BARS = (0.30, 0.55, 0.86, 1.00, 0.72, 0.44, 0.66, 0.92, 0.58, 0.34)

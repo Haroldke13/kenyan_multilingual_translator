@@ -8,20 +8,20 @@ import pytest
 
 pytest.importorskip("flask")
 
-from kikuyu_ai.config import Settings
-from kikuyu_ai.languages import DEFAULT_LANGUAGE, LANGUAGES, get, ordered
-from kikuyu_ai.web import flask_app
+from language_ai.config import Settings
+from language_ai.languages import DEFAULT_LANGUAGE, LANGUAGES, get, ordered
+from language_ai.web import flask_app
 
 
-def test_kikuyu_is_the_default():
-    assert DEFAULT_LANGUAGE == "kikuyu"
-    assert get(None).code == "kikuyu"
-    assert ordered()[0].code == "kikuyu"
+def test_language_is_the_default():
+    assert DEFAULT_LANGUAGE == "language"
+    assert get(None).code == "language"
+    assert ordered()[0].code == "language"
 
 
 def test_an_unknown_language_falls_back_rather_than_failing():
-    assert get("klingon").code == "kikuyu"
-    assert get("").code == "kikuyu"
+    assert get("klingon").code == "language"
+    assert get("").code == "language"
 
 
 def test_language_codes_are_matched_case_insensitively():
@@ -32,17 +32,17 @@ def test_every_language_carries_a_distinct_nllb_tag():
     tags = [language.nllb_code for language in LANGUAGES.values()]
     assert len(tags) == len(set(tags))
     assert get("luo").nllb_code == "luo_Latn"
-    assert get("kikuyu").nllb_code == "kik_Latn"
+    assert get("language").nllb_code == "kik_Latn"
 
 
-def test_kikuyu_keeps_the_top_level_corpus_folder(tmp_path: Path):
-    """Existing installs keep working, so Kikuyu must not move into a subfolder."""
-    assert get("kikuyu").bible_dir(tmp_path) == tmp_path
+def test_language_keeps_the_top_level_corpus_folder(tmp_path: Path):
+    """Existing installs keep working, so Language must not move into a subfolder."""
+    assert get("language").bible_dir(tmp_path) == tmp_path
     assert get("luo").bible_dir(tmp_path) == tmp_path / "luo"
 
 
 def test_luo_names_its_own_speech_model():
-    """Luo cannot share the Kikuyu speech model, so it must name its own."""
+    """Luo cannot share the Language speech model, so it must name its own."""
     luo = get("luo")
     assert luo.speech is True
     assert luo.asr_backend == "mms"
@@ -51,36 +51,36 @@ def test_luo_names_its_own_speech_model():
 
 
 def test_settings_are_adjusted_per_language(tmp_path: Path):
-    from kikuyu_ai.languages import settings_for
+    from language_ai.languages import settings_for
 
     base = replace(Settings.from_env(), root=tmp_path)
-    kikuyu = settings_for(get("kikuyu"), base)
+    language = settings_for(get("language"), base)
     luo = settings_for(get("luo"), base)
 
-    assert kikuyu.translation_src_lang == "kik_Latn"
+    assert language.translation_src_lang == "kik_Latn"
     assert luo.translation_src_lang == "luo_Latn"
     # Every language now uses MMS, each with its own adapter.
-    assert kikuyu.asr_backend == "mms" and kikuyu.asr_language == "kik"
+    assert language.asr_backend == "mms" and language.asr_language == "kik"
     assert luo.asr_backend == "mms" and luo.asr_language == "luo"
 
 
-def test_kikuyu_can_be_put_back_on_its_whisper_model(tmp_path: Path, monkeypatch):
-    """MMS transcribes Kikuyu better but needs far more memory, so both stay open."""
-    from kikuyu_ai.languages import settings_for
+def test_language_can_be_put_back_on_its_whisper_model(tmp_path: Path, monkeypatch):
+    """MMS transcribes Language better but needs far more memory, so both stay open."""
+    from language_ai.languages import settings_for
 
     base = replace(Settings.from_env(), root=tmp_path)
-    monkeypatch.setenv("KIKUYU_ASR_ENGINE", "whisper")
+    monkeypatch.setenv("LANGUAGE_ASR_ENGINE", "whisper")
 
-    kikuyu = settings_for(get("kikuyu"), base)
+    language = settings_for(get("language"), base)
 
-    assert kikuyu.asr_backend == base.asr_backend
-    assert kikuyu.asr_model == base.asr_model
-    # Only Kikuyu has a second option; the rest stay on MMS.
+    assert language.asr_backend == base.asr_backend
+    assert language.asr_model == base.asr_model
+    # Only Language has a second option; the rest stay on MMS.
     assert settings_for(get("luo"), base).asr_backend == "mms"
 
 
 def test_the_six_supported_languages_are_all_present():
-    assert set(LANGUAGES) == {"kikuyu", "luo", "kamba", "swahili", "somali", "oromo"}
+    assert set(LANGUAGES) == {"language", "luo", "kamba", "swahili", "somali", "oromo"}
     for language in LANGUAGES.values():
         assert language.nllb_code.endswith("_Latn")
         assert language.asr_language
@@ -88,7 +88,7 @@ def test_the_six_supported_languages_are_all_present():
 
 def test_speech_is_offered_only_when_the_model_is_on_disk(tmp_path: Path):
     """A missing model must disable the upload form, not fail at run time."""
-    from kikuyu_ai.languages import speech_available
+    from language_ai.languages import speech_available
 
     base = replace(Settings.from_env(), root=tmp_path)
 
@@ -107,7 +107,7 @@ def test_speech_is_offered_only_when_the_model_is_on_disk(tmp_path: Path):
 
 def install_fake_models(root: Path) -> None:
     """A stand-in MMS tree so the upload form is offered in tests."""
-    from kikuyu_ai.languages import LANGUAGES, MMS_MODEL
+    from language_ai.languages import LANGUAGES, MMS_MODEL
 
     folder = root / MMS_MODEL
     folder.mkdir(parents=True, exist_ok=True)
@@ -124,16 +124,16 @@ def settings(tmp_path: Path) -> Settings:
     (bible / "luo").mkdir(parents=True)
     (bible / "parallel.jsonl").write_text(
         json.dumps({"book": "GEN", "chapter": 1, "verse": 1,
-                    "kikuyu": "Kĩambĩrĩria-inĩ", "english": "In the beginning"}, ensure_ascii=False) + "\n",
+                    "language": "Kĩambĩrĩria-inĩ", "english": "In the beginning"}, ensure_ascii=False) + "\n",
         encoding="utf-8",
     )
     (bible / "luo" / "parallel.jsonl").write_text(
         json.dumps({"book": "GEN", "chapter": 1, "verse": 1,
-                    "kikuyu": "Kar chakruok", "english": "In the beginning"}, ensure_ascii=False) + "\n",
+                    "language": "Kar chakruok", "english": "In the beginning"}, ensure_ascii=False) + "\n",
         encoding="utf-8",
     )
     # Make the shared speech model look installed, so speech-enabled routes run.
-    (tmp_path / get("kikuyu").asr_model).mkdir(parents=True, exist_ok=True)
+    (tmp_path / get("language").asr_model).mkdir(parents=True, exist_ok=True)
     return replace(
         base, root=tmp_path, sessions=tmp_path / "sessions", bible=bible,
         corrections_db=tmp_path / "corrections.db", api_url=None, max_upload_mb=1,
@@ -184,11 +184,11 @@ def wait_for(client, job_id: str) -> dict:
     raise AssertionError("job never finished")
 
 
-def test_the_page_defaults_to_kikuyu(client):
+def test_the_page_defaults_to_language(client):
     body = client.get("/").get_data(as_text=True)
 
-    assert "Kikuyu <span>" in body
-    assert 'aria-current="page">Kikuyu' in body
+    assert "Language <span>" in body
+    assert 'aria-current="page">Language' in body
 
 
 def test_the_navbar_switches_to_luo(client):
@@ -217,7 +217,7 @@ def test_luo_text_is_translated_with_the_luo_tag(client):
 
 def test_the_source_tag_is_restored_after_a_luo_translation(client):
     client.post("/translate-text", data={"text": "Nyasaye ber", "lang": "luo"})
-    response = client.post("/translate-text", data={"text": "Ngai nĩ mwega", "lang": "kikuyu"})
+    response = client.post("/translate-text", data={"text": "Ngai nĩ mwega", "lang": "language"})
     wait_for(client, response.headers["Location"].rstrip("/").rsplit("/", 1)[-1])
 
     assert client.translator.seen[-1][1] == "kik_Latn"
@@ -233,8 +233,8 @@ def test_each_language_matches_verses_against_its_own_corpus(client):
     assert client.translator.seen == []
 
 
-def test_a_kikuyu_verse_does_not_match_the_luo_corpus(client):
-    response = client.post("/translate-text", data={"text": "Kar chakruok", "lang": "kikuyu"})
+def test_a_language_verse_does_not_match_the_luo_corpus(client):
+    response = client.post("/translate-text", data={"text": "Kar chakruok", "lang": "language"})
     job = wait_for(client, response.headers["Location"].rstrip("/").rsplit("/", 1)[-1])
 
     assert job["result"]["bible_match"] is None
@@ -261,7 +261,7 @@ def test_audio_is_refused_when_the_language_model_is_missing(settings: Settings,
     assert "not installed" in body
 
 
-def test_kikuyu_still_accepts_audio(client, monkeypatch):
+def test_language_still_accepts_audio(client, monkeypatch):
     body = client.get("/").get_data(as_text=True)
 
     assert 'name="audio"' in body

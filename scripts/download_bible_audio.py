@@ -71,7 +71,7 @@ def destination_for(row: dict, output: Path, content_type: str | None = None) ->
 
 
 def download(row: dict, output: Path, overwrite: bool) -> Path:
-    request = Request(str(row["url"]), headers={"User-Agent": "kikuyu-ai-data-builder/0.1"})
+    request = Request(str(row["url"]), headers={"User-Agent": "language-ai-data-builder/0.1"})
     with urlopen(request, timeout=120) as response:
         destination = destination_for(row, output, response.headers.get_content_type())
         if destination.exists() and destination.stat().st_size > 0 and not overwrite:

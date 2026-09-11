@@ -1,6 +1,6 @@
 // Caches the app shell so the interface opens with no network at all.
 // Model inference is never cached: it must reach the server that holds the models.
-const CACHE = "kikuyu-shell-v1";
+const CACHE = "language-shell-v1";
 const SHELL = [
   "./",
   "index.html",
