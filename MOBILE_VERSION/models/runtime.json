@@ -1,0 +1,9 @@
+{
+  "translation_backend": "ctranslate2",
+  "translation_compute_type": "int8",
+  "translation_beam_size": 4,
+  "translation_max_new_tokens": 128,
+  "speech_file": "model.int8.onnx",
+  "packed_by": "tools/pack_mobile.py",
+  "speech_backend": "onnxruntime"
+}

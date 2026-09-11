@@ -1,0 +1,38 @@
+__pycache__/
+.venv/
+*.pyc
+data/sessions/*
+data/*.db
+models/downloads/
+data/certs/
+data/bible/raw/
+data/translation/
+data/voice/
+data/asr/
+data/clips/
+data/bible/orthography.json
+data/bible/luo/
+models/downloads/hf-probe/
+data/translation/luo_*.jsonl
+data/bible/swahili/
+data/bible/oromo/
+data/bible/somali/
+data/bible/kamba/
+
+# Phone package: the models are ~1 GB and are rebuilt by
+# MOBILE_VERSION/tools/pack_mobile.py, so they travel by USB, not by git.
+MOBILE_VERSION/models/translation/
+MOBILE_VERSION/models/speech/
+# Regenerated on first use; kept in the copied folder for instant startup.
+MOBILE_VERSION/data/*/verses.index
+MOBILE_VERSION/data/corrections.jsonl
+
+# Local environment file (see .env.example for the documented settings)
+.env
+
+# Packaging artefacts
+*.egg-info/
+
+# Scratch / personal files that should not be published
+const fib = (n) => {
+*.ogg
