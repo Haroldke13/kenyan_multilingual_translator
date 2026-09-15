@@ -462,3 +462,13 @@ LANGUAGE_TRANSLATION_MODEL=models/translation/language-english
 Real retraining requires corrected labels. Do not train on the app's own uncorrected output as if it were ground truth; that usually reinforces the same hallucinations and repetitions.
 
 The Gradio UI supports upload and microphone input when `gradio` is installed.
+
+## Licence
+
+**Proprietary software — all rights reserved.** Copyright © 2026 Joel Harold Onyango.
+
+This repository is not open source. The full terms are in [LICENSE](LICENSE); in
+summary, you may not copy, redistribute, modify, sublicense, publish, re-host or
+commercially exploit this software, in whole or in part, without the prior
+written permission of the copyright holder. Access to this repository does not
+grant any licence beyond reading it.
