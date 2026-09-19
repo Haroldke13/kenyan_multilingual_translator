@@ -465,10 +465,30 @@ The Gradio UI supports upload and microphone input when `gradio` is installed.
 
 ## Licence
 
-**Proprietary software — all rights reserved.** Copyright © 2026 Joel Harold Onyango.
+**Code: Apache-2.0.** Copyright © 2026 Joel Harold Onyango. Use it, change it,
+fork it, build on it — keep [`LICENSE`](LICENSE) and [`NOTICE`](NOTICE) with it.
 
-This repository is not open source. The full terms are in [LICENSE](LICENSE); in
-summary, you may not copy, redistribute, modify, sublicense, publish, re-host or
-commercially exploit this software, in whole or in part, without the prior
-written permission of the copyright holder. Access to this repository does not
-grant any licence beyond reading it.
+Apache-2.0 rather than MIT for two reasons that matter for this project: it
+grants patent rights explicitly, and its section 5 settles what happens to a
+pull request — anything you submit is under the same licence unless you say
+otherwise, so contributing needs no separate agreement and you keep your
+copyright.
+
+**The data and the models are not Apache-2.0, and two of them are stricter.**
+
+| | Licence | In practice |
+| --- | --- | --- |
+| The code | Apache-2.0 | Do what you like, keep the notices |
+| Bible corpora in this repo | CC BY-SA 4.0 + public domain | Keep attribution; derivatives — **including models trained on them** — stay CC BY-SA |
+| NLLB-200 and MMS (downloaded, not shipped) | CC BY-NC 4.0 | **Non-commercial only** |
+
+So as it ships you can study, extend and run this, but you cannot sell a service
+built on it — because the two models it downloads forbid commercial use. That is
+Meta's licence, not this project's, and the model layer is swappable.
+
+[`DATA_AND_MODELS.md`](DATA_AND_MODELS.md) is the full version, including what
+counts as a derivative work and the consent rules for contributed recordings.
+
+> Until 20 September 2026 this repository was proprietary and all rights were
+> reserved. It was relicensed so that the languages it does not yet support can
+> be added by the people who speak them. See [`CONTRIBUTING.md`](CONTRIBUTING.md).

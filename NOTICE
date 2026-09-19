@@ -1,0 +1,35 @@
+Kenyan Multilingual Translator
+Copyright 2026 Joel Harold Onyango
+
+This product includes software developed by Joel Harold Onyango, licensed
+under the Apache License, Version 2.0 (see LICENSE).
+
+The Apache licence covers the SOURCE CODE of this project. It does not and
+cannot cover the third-party data included in this repository, nor the models
+this software downloads at run time. Those keep their own terms, and some of
+those terms are stricter than Apache-2.0. DATA_AND_MODELS.md states each one.
+
+In summary:
+
+  Bible corpora included in this repository
+    data/bible/parallel.jsonl
+    MOBILE_VERSION/data/*/verses.jsonl.gz
+    models/translation/*/parallel.*.jsonl
+
+    Kikuyu text: Biblica Open Kikuyu Contemporary Version,
+      CC BY-SA 4.0 — attribution required, and derivative works, INCLUDING
+      MODELS TRAINED ON IT, must be shared under the same licence.
+    English text: World English Bible, public domain.
+    Both obtained from eBible.org.
+
+  Models downloaded at run time, not included here
+    facebook/nllb-200-distilled-600M   CC BY-NC 4.0 — non-commercial only
+    facebook/mms-1b-all                CC BY-NC 4.0 — non-commercial only
+
+    This project does not redistribute either model. It downloads them from
+    the Hugging Face Hub on first use, and their licences apply to you as the
+    person who downloaded them. As shipped, with these defaults, this is not
+    a commercial-use system.
+
+Anyone redistributing this project, or a model trained with it, is responsible
+for carrying these notices forward.
