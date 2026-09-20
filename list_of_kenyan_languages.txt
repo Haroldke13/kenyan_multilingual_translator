@@ -1,0 +1,240 @@
+===============================================================================
+ LANGUAGES OF KENYA — a working list for kenyan_multilingual_translator
+===============================================================================
+
+WHY THIS FILE EXISTS
+--------------------
+language_ai/languages.py is the registry of what the app can actually do today.
+This file is the wider map: every language spoken in Kenya, and — for each one —
+whether adding it is an afternoon's work or a research project.
+
+That distinction is the whole point. Adding a language to this app needs two
+things:
+
+  1. an NLLB-200 tag, so the translation model knows what it is reading
+  2. an MMS adapter, if you want to accept speech as well as text
+
+Where both exist, adding a language really is close to a download plus a row in
+LANGUAGES. Where the NLLB tag does not exist, there is no shortcut: you need a
+parallel corpus and a fine-tune, which is a different order of effort. Grouping
+the list by that fact is more useful than grouping it alphabetically.
+
+Kenya has roughly 60-70 living languages depending on how you count dialect
+clusters — Luhya and Kalenjin and Mijikenda are each counted here as one entry
+with their varieties listed, because that is how speakers and the census treat
+them, even though Ethnologue splits them.
+
+
+HOW TO READ THE STATUS COLUMN
+-----------------------------
+  LIVE      already in language_ai/languages.py and working
+  READY     NLLB tag exists → text translation is reachable now
+  SPEECH    MMS adapter exists but no NLLB tag → transcription only, no MT
+  CORPUS    neither → needs a parallel corpus before anything works
+  ?         could not confirm; verify before relying on it
+
+⚠️ VERIFY BEFORE WIRING ANYTHING IN. ISO codes below are ISO 639-3 and are
+reliable. NLLB tags and MMS adapter availability were checked in September 2026
+against Meta's published language lists, but model coverage changes and a tag
+that looks plausible may not exist. Confirm against the FLORES-200 language list
+and the MMS supported-languages table before adding a row to LANGUAGES.
+Speaker figures are rounded orders of magnitude from census and Ethnologue
+estimates; treat them as "how big roughly", never as data.
+
+
+===============================================================================
+ OFFICIAL AND NATIONAL
+===============================================================================
+ISO   LANGUAGE            NATIVE NAME        SPEAKERS   NLLB        STATUS
+---------------------------------------------------------------------------
+eng   English             English            official   eng_Latn    n/a (target)
+swh   Swahili             Kiswahili          ~20M L2    swh_Latn    LIVE
+
+  Swahili is the national language and co-official with English. Most Kenyans
+  speak it as a second language. It is by far the best-resourced language on
+  this list and the safest pivot if you ever want to translate between two
+  Kenyan languages rather than into English.
+
+
+===============================================================================
+ TIER 1 — NLLB-200 COVERAGE EXISTS  (text translation reachable)
+===============================================================================
+ISO   LANGUAGE            NATIVE NAME        SPEAKERS   NLLB        STATUS
+---------------------------------------------------------------------------
+kik   Kikuyu              Gĩkũyũ             ~8.1M      kik_Latn    LIVE
+luo   Dholuo              Dholuo             ~4.2M      luo_Latn    LIVE
+kam   Kamba               Kĩkamba            ~4.7M      kam_Latn    LIVE
+som   Somali              Af-Soomaali        ~2.8M      som_Latn    LIVE
+gax   Borana Oromo        Afaan Booranaa     ~0.7M      gaz_Latn    LIVE (as "oromo")
+lug   Ganda               Luganda            (diaspora) lug_Latn    READY
+nus   Nuer                Thok Naath         (refugee)  nus_Latn    READY ?
+kin   Kinyarwanda         Ikinyarwanda       (refugee)  kin_Latn    READY
+
+  The Oromo entry deserves a note. NLLB's gaz_Latn is West Central Oromo, which
+  is the Ethiopian variety. Borana Oromo as spoken in Marsabit and Isiolo is
+  close but not identical, so output will be usable and slightly off. Worth
+  labelling honestly in the UI rather than claiming Borana support.
+
+  The last three are here because Kenya hosts large refugee and migrant
+  communities at Kakuma and Dadaab and in Nairobi. They are not indigenous
+  Kenyan languages, but they are languages spoken in Kenya by people who need
+  translation, which is arguably the point of the app.
+
+
+===============================================================================
+ TIER 2 — MAJOR KENYAN LANGUAGES, NO NLLB COVERAGE  (corpus work needed)
+===============================================================================
+These are the ones that matter most and are hardest. Together they are spoken
+by well over ten million people, and none of them can be reached by swapping a
+tag. Each needs aligned parallel text before translation is possible at all.
+
+ISO   LANGUAGE            NATIVE NAME        SPEAKERS   NLLB        STATUS
+---------------------------------------------------------------------------
+luy   Luhya (cluster)     Luluhya            ~6.8M      —           CORPUS
+kln   Kalenjin (cluster)  Kalenjin           ~6.4M      —           CORPUS
+guz   Gusii               Ekegusii           ~2.7M      —           CORPUS
+mer   Meru               Kĩmĩrũ             ~2.0M      —           CORPUS
+mas   Maasai              ɔl Maa             ~1.2M      —           CORPUS
+tuv   Turkana             Ŋaturkana          ~1.2M      —           CORPUS
+ebu   Embu                Kĩembu             ~0.4M      —           CORPUS
+dav   Taita               Kidawida           ~0.4M      —           CORPUS
+teo   Teso                Ateso              ~0.3M      —           CORPUS
+pko   Pökoot              Pökoot             ~0.8M      —           CORPUS
+saq   Samburu             Sampur             ~0.3M      —           CORPUS
+kuj   Kuria               Igikuria           ~0.3M      —           CORPUS
+thk   Tharaka             Kĩtharaka          ~0.2M      —           CORPUS
+mbe   Mbeere              Kĩmbeere           ~0.2M      —           CORPUS
+
+  CLUSTERS, EXPANDED
+
+  Luhya varieties (each is a distinct ISO language; speakers usually say
+  "Luhya"):  Bukusu (bxk) · Maragoli/Logooli (rag) · Idakho-Isukha-Tiriki (ida)
+  Kabras · Khayo (lko) · Kisa (lks) · Marama (lrm) · Nyala (nle) · Nyore (nyd)
+  Samia (lsm) · Tachoni (lts) · Tsotso · Wanga (lwg)
+
+  Kalenjin varieties:  Kipsigis (sgc) · Nandi · Keiyo (eyo) · Marakwet (enb)
+  Tugen (tuy) · Sabaot (spy) · Terik (tec) · Pökoot (pko, listed separately)
+
+  Mijikenda varieties (coastal Bantu, ~2.0M combined, all CORPUS):
+  Giryama (nyf) · Digo (dig) · Duruma (dug) · Chonyi (coh) · Rabai
+  Ribe · Kambe · Jibana · Kauma
+
+  A practical note on where to start. Luhya and Kalenjin have the most speakers
+  and the least model coverage, so they are the highest-value targets — but they
+  are clusters, and picking the wrong variety produces something that reads as
+  wrong to most of the people you were trying to serve. Bukusu for Luhya and
+  Kipsigis for Kalenjin are the usual pragmatic choices: each is the largest
+  single variety in its cluster and each has the most written material.
+
+  The Bible-alignment approach this project already uses works well here. Most
+  of these languages have a complete Bible translation, which is the largest
+  aligned parallel corpus that exists for any of them, and often the only one.
+
+
+===============================================================================
+ TIER 3 — CUSHITIC LANGUAGES OF THE NORTH AND EAST
+===============================================================================
+ISO   LANGUAGE            NATIVE NAME        SPEAKERS   NLLB        STATUS
+---------------------------------------------------------------------------
+som   Somali              Af-Soomaali        ~2.8M      som_Latn    LIVE
+gax   Borana              Afaan Booranaa     ~0.7M      gaz_Latn    LIVE*
+rel   Rendille            Rendille           ~0.1M      —           CORPUS
+gbb   Gabra               Gabra              ~0.1M      —           CORPUS
+orc   Orma                Orma               ~0.1M      —           CORPUS
+bji   Burji               Burji              ~0.05M     —           CORPUS
+dsh   Daasanach           Daasanach          ~0.05M     —           CORPUS
+gex   Garre               Garre              ~0.05M     —           CORPUS
+ssn   Waata               Waata              small      —           CORPUS
+bob   Aweer (Boni)        Aweer              <1,000     —           ENDANGERED
+elo   El Molo             El Molo            ~10 fluent —           MORIBUND
+
+  El Molo is effectively gone as a spoken first language; the community has
+  shifted to Samburu. If documentation is ever a goal for this project rather
+  than translation, this is where the urgency is.
+
+
+===============================================================================
+ TIER 4 — SMALLER AND ENDANGERED
+===============================================================================
+ISO   LANGUAGE            NATIVE NAME        SPEAKERS   STATUS
+---------------------------------------------------------------------------
+pkb   Pokomo              Kipfokomo          ~0.1M      CORPUS
+suh   Suba                Olusuba            ~0.03M     ENDANGERED
+sgm   Singa/Suba-Simbiti  —                  small      ENDANGERED
+mlk   Ilwana (Malakote)   Kiwilwana          ~0.02M     ENDANGERED
+seg   Segeju              Kisegeju           small      ENDANGERED
+dal   Dahalo              Dahalo             <500       MORIBUND
+oki   Okiek (Ogiek)       Akiek              ~0.03M     ENDANGERED
+tec   Terik               Terik              ~0.03M     ENDANGERED
+ilk   Ilchamus (Njemps)   Ilchamus           ~0.03M     ENDANGERED
+boh   Boma/Bajuni         Kibajuni           ~0.05M     CORPUS
+
+  Dahalo is unusual and worth knowing about: it retains clicks, which no other
+  Kenyan language does, and is generally taken as the last trace of an older
+  linguistic layer in East Africa. Fewer than 500 speakers remain.
+
+
+===============================================================================
+ NOT A LANGUAGE FAMILY, BUT SPOKEN IN KENYA
+===============================================================================
+xki   Kenyan Sign Language (KSL)              ~0.6M deaf and hard of hearing
+
+  Constitutionally recognised. Deliberately listed here because a project called
+  a "multilingual translator" that ignores KSL is making a choice, and it should
+  be a deliberate one. Sign language translation is a different technical
+  problem — video in, not audio — and is out of scope for the current
+  architecture. Saying so is better than quietly omitting it.
+
+—     Sheng                                   widespread, urban youth
+
+  A Swahili-English-ethnic-language urban vernacular, mainly Nairobi. Not a
+  separate language by most definitions, but it is what a great many young
+  Kenyans actually speak, it changes fast, and it will show up in any real user
+  input. Worth handling as noise-tolerance in the Swahili path rather than as
+  its own entry.
+
+—     Kenyan Indian languages                 ~0.1M
+
+  Gujarati (guj), Punjabi (pan), Hindi (hin), Konkani, Kutchi. All except Kutchi
+  and Konkani have solid NLLB coverage, so they are technically READY if ever
+  wanted.
+
+—     Arabic                                  coastal and religious use
+  arb_Arab — NLLB coverage is excellent. Relevant on the coast and in religious
+  contexts.
+
+
+===============================================================================
+ SUGGESTED ORDER OF WORK
+===============================================================================
+1. Finish what is already reachable. Ganda, Kinyarwanda and Nuer have NLLB tags
+   and serve real refugee and migrant populations in Kenya. Cheapest wins here.
+
+2. Bukusu (Luhya) and Kipsigis (Kalenjin). Largest speaker populations with zero
+   coverage anywhere. Highest impact per unit of effort, and the Bible-alignment
+   method this repo already uses is the realistic route in.
+
+3. Gusii and Meru. Both over two million speakers, both entirely unserved, both
+   with complete Bible translations to align against.
+
+4. Maasai and Turkana. Smaller, but both are spoken in regions where English and
+   Swahili literacy is lowest, which is exactly where a translator is worth most.
+
+5. Everything else, documentation-first for the endangered ones.
+
+
+===============================================================================
+ SOURCES AND MAINTENANCE
+===============================================================================
+ISO 639-3 codes          SIL International registry
+Speaker estimates        Kenya National Bureau of Statistics census, Ethnologue
+NLLB-200 coverage        Meta FLORES-200 language list
+MMS adapter coverage     Meta MMS supported-languages table
+Endangerment status      UNESCO Atlas of the World's Languages in Danger
+
+Checked September 2026. Model coverage is the part most likely to go stale —
+Meta adds languages, and a tag absent today may exist next release. Re-check
+the FLORES-200 and MMS lists before concluding a language is unreachable.
+
+Corrections welcome, particularly on native-language spellings and on dialect
+groupings, which are contested and which this file necessarily simplifies.
